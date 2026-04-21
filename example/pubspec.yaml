@@ -1,0 +1,16 @@
+name: collapsible_side_menu_example
+description: "Demonstrate how to use collapsible_side_menu package."
+
+publish_to: 'none' # This ensures the example app won't be published to pub.dev
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  collapsible_side_menu:
+    path: ../
+
+flutter:
+  uses-material-design: true

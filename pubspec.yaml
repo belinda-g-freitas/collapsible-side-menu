@@ -1,0 +1,32 @@
+name: collapsible_side_menu
+description: "A Flutter customizable collapsible side menu with sub-menus option."
+version: 1.1.1
+homepage:
+
+environment:
+  sdk: ^3.11.4
+  flutter: ">=3.41.6"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+screenshots:
+  - description: 'Mobile'
+  - path: 'screenshots/'
+  - description: 'Desktop'
+  - path: 'screenshots/'
+  - description: 'Web'
+  - path: 'screenshots/'
+
+topics:
+  - menu
+  - side menu
+  - collapsible menu
+  - sub-menu
+  - adptive side menu
