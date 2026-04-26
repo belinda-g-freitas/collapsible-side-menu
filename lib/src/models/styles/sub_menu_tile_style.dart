@@ -18,17 +18,15 @@ class SubMenuTileStyle extends BaseTileStyle {
     super.borderRadius = MenuConstants.borderRadius,
     super.decoration,
     super.selectedDecoration,
-    super.selectedIndicator,
     super.padding = .zero,
     super.margin = MenuConstants.tileMargin,
-    super.horizontalSpacing = 3,
+    super.horizontalSpacing = MenuConstants.horizontalSpacing,
     this.defaultSubTilesStyle,
     super.tileHeight = MenuConstants.subTileHeight,
   }) : assert(padding.isNonNegative),
        assert(margin.isNonNegative),
        assert(decoration == null || decoration.debugAssertIsValid()),
-       assert(selectedDecoration == null || selectedDecoration.debugAssertIsValid()),
-       assert(selectedIndicator == null || selectedIndicator.debugAssertIsValid());
+       assert(selectedDecoration == null || selectedDecoration.debugAssertIsValid());
 
   /// Uses values from this style if default are null
   SubMenuTileStyle resolveWith([final SubMenuTileStyle? style]) {
@@ -45,7 +43,6 @@ class SubMenuTileStyle extends BaseTileStyle {
       borderRadius: style.borderRadius,
       decoration: decoration ?? style.decoration,
       selectedDecoration: selectedDecoration ?? style.selectedDecoration,
-      selectedIndicator: selectedIndicator ?? style.selectedIndicator,
       padding: style.padding,
       margin: style.margin,
       defaultSubTilesStyle: defaultSubTilesStyle ?? style.defaultSubTilesStyle,
@@ -68,7 +65,6 @@ class SubMenuTileStyle extends BaseTileStyle {
       tileHeight: style.subTileStyle?.tileHeight ?? tileHeight,
       decoration: decoration ?? style.subTileStyle?.decoration ?? style.decoration,
       selectedDecoration: selectedDecoration ?? style.subTileStyle?.selectedDecoration ?? style.selectedDecoration,
-      selectedIndicator: selectedIndicator ?? style.subTileStyle?.selectedIndicator ?? style.selectedIndicator,
       padding: style.subTileStyle?.padding ?? padding,
       margin: style.subTileStyle?.margin ?? margin,
       defaultSubTilesStyle: defaultSubTilesStyle ?? style.subTileStyle?.defaultSubTilesStyle ?? style.subTileStyle,
@@ -88,7 +84,6 @@ class SubMenuTileStyle extends BaseTileStyle {
     double? tileHeight,
     Decoration? decoration,
     Decoration? selectedDecoration,
-    Decoration? selectedIndicator,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     SubMenuTileStyle? defaultSubTilesStyle,
@@ -106,7 +101,6 @@ class SubMenuTileStyle extends BaseTileStyle {
       tileHeight: tileHeight ?? this.tileHeight,
       decoration: decoration ?? this.decoration,
       selectedDecoration: selectedDecoration ?? this.selectedDecoration,
-      selectedIndicator: selectedIndicator ?? this.selectedIndicator,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
       defaultSubTilesStyle: defaultSubTilesStyle ?? this.defaultSubTilesStyle,
@@ -116,7 +110,7 @@ class SubMenuTileStyle extends BaseTileStyle {
 
   @override
   String toString() {
-    return 'SubMenuTileStyle(titleStyle: $titleStyle, selectedTitleStyle: $selectedTitleStyle, color: $color, selectedColor: $selectedColor, hoverColor: $hoverColor, backgroundColor: $backgroundColor, selectedBackgroundColor: $selectedBackgroundColor, borderRadius: $borderRadius, tileHeight: $tileHeight, decoration: $decoration, selectedDecoration: $selectedDecoration, selectedIndicator: $selectedIndicator, padding: $padding, margin: $margin, defaultSubTilesStyle: $defaultSubTilesStyle, horizontalSpacing: $horizontalSpacing)';
+    return 'SubMenuTileStyle(titleStyle: $titleStyle, selectedTitleStyle: $selectedTitleStyle, color: $color, selectedColor: $selectedColor, hoverColor: $hoverColor, backgroundColor: $backgroundColor, selectedBackgroundColor: $selectedBackgroundColor, borderRadius: $borderRadius, tileHeight: $tileHeight, decoration: $decoration, selectedDecoration: $selectedDecoration, padding: $padding, margin: $margin, defaultSubTilesStyle: $defaultSubTilesStyle, horizontalSpacing: $horizontalSpacing)';
   }
 
   @override

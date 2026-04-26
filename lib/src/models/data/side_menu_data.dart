@@ -32,4 +32,9 @@ class SideMenuData {
   final Spacer? spacerAfterCustomChild;
   final Spacer? spacerAfterItems;
   final CustomChildPosition customChildPosition;
+
+  @override
+  String toString() {
+    return 'SideMenuData(header: $header, animHeader: $animHeader, footer: $footer, animFooter: $animFooter, items: $items, animItems: $animItems, customChild: $customChild, animCustomChild: $animCustomChild, customChildFlex: $customChildFlex, spacerAfterCustomChild: $spacerAfterCustomChild, spacerAfterItems: $spacerAfterItems, customChildPosition: $customChildPosition)';
+  }
 }

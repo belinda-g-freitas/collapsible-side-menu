@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show EdgeInsetsGeometry, Size, TextAlign, TextStyle, Widget, Divider;
+import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, Size, TextAlign, TextStyle, VoidCallback, Widget;
 
 import '../../utils/menu_constants.dart';
 import '../styles/menu_tile_style.dart';
@@ -12,7 +12,7 @@ mixin _BaseSideMenuData {
   Widget? get selectedLeading;
   Widget? get trailing;
   TileBadgeBuilder? get badgeBuilder;
-  void Function(bool isSelected)? get onTap;
+  VoidCallback? get onTap;
 }
 
 //
@@ -64,10 +64,8 @@ class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
   final TileBadgeBuilder? badgeBuilder;
 
   @override
-  final void Function(bool isSelected)? onTap;
+  final VoidCallback? onTap;
 
-  /// If null, will be set to `const Size(MenuConstants.selectedIndicatorWidth, MenuConstants.selectedIndicatorHeight` if it's a tile
-  /// and to `const Size(MenuConstants.selectedIndicatorWidth, MenuConstants.subTileSelectedIndicatorHeight)` if it's a sub-tile.
   final Size selectedIndicatorSize;
   final bool hasSelectedIndicator;
   final MenuTileStyle? style;
@@ -109,7 +107,7 @@ class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
     MenuTileStyle? style,
     List<SideMenuSubTileData>? subTiles,
     TileBadgeBuilder? badgeBuilder,
-    void Function(bool isSelected)? onTap,
+    VoidCallback? onTap,
     Size? selectedIndicatorSize,
     bool? hasSelectedIndicator,
   }) {
@@ -129,7 +127,7 @@ class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
 
   @override
   String toString() {
-    return 'SideMenuTileData(title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, style: $style, subTiles: $subTiles, badgeBuilder: $badgeBuilder, onTap: $onTap, selectedIndicatorSize: $selectedIndicatorSize, hasSelectedIndicator: $hasSelectedIndicator)';
+    return 'SideMenuTileData(title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap, selectedIndicatorSize: $selectedIndicatorSize, hasSelectedIndicator: $hasSelectedIndicator, style: $style, subTiles: $subTiles)';
   }
 }
 
@@ -156,7 +154,7 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
   final TileBadgeBuilder? badgeBuilder;
 
   @override
-  final void Function(bool isSelected)? onTap;
+  VoidCallback? onTap;
 
   SideMenuSubTileData({
     required this.title,
@@ -190,8 +188,7 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
     SubMenuTileStyle? style,
     List<SideMenuSubTileData>? subTiles,
     TileBadgeBuilder? badgeBuilder,
-    void Function(bool isSelected)? onTap,
-    Size? selectedIndicatorSize,
+    VoidCallback? onTap,
     bool? hasSelectedIndicator,
   }) {
     return SideMenuSubTileData(
@@ -208,6 +205,6 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
 
   @override
   String toString() {
-    return 'SideMenuSubTileData(title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap, subTiles: $subTiles, style: $style)';
+    return 'SideMenuSubTileData(subTiles: $subTiles, style: $style, title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap)';
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/data/side_menu_item_data.dart';
@@ -36,95 +37,13 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
   late SubMenuTileStyle style;
 
   bool get _isOpen => widget.openNodes.contains(widget.basePath.join('-'));
-
-  @override
-  void initState() {
-    style = widget.tile.style ?? SubMenuTileStyle();
-
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant SideMenuSubTile oldWidget) {
-    if (oldWidget.tile.style != widget.tile.style) {
-      style = widget.tile.style ?? SubMenuTileStyle();
-    }
-
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isRTL = Utils.isRTL(context);
-
-    return Padding(
-      padding: style.margin,
-      child: Material(
-        color: Colors.transparent,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: style.borderRadius,
-            border: _isOpen
-                ? Border(
-                    left: isRTL ? BorderSide.none : BorderSide(color: style.color!, width: style.openMenuLineWidth),
-                    right: isRTL ? BorderSide(color: style.color!, width: style.openMenuLineWidth) : BorderSide.none,
-                    bottom: BorderSide(color: style.color!, width: style.openMenuLineWidth),
-                  )
-                : null,
-          ),
-          curve: Curves.easeInOut,
-          alignment: .topCenter,
-          child: Column(
-            crossAxisAlignment: .start,
-            mainAxisSize: .min,
-            children: [
-              // tile
-              InkWell(
-                onTap: () {
-                  widget.onToggle(widget.basePath);
-                  widget.tile.onTap?.call(_isOpen);
-                },
-                borderRadius: style.borderRadius,
-                hoverColor: _isOpen ? Colors.transparent : style.hoverColor ?? Theme.of(context).highlightColor,
-                child: Container(
-                  height: style.tileHeight,
-                  padding: style.padding,
-                  decoration: _isOpen
-                      ? style.selectedDecoration
-                      : style.decoration ??
-                            ShapeDecoration(
-                              shape: RoundedRectangleBorder(borderRadius: style.borderRadius),
-                              color: _isOpen ? style.selectedBackgroundColor! : style.backgroundColor,
-                            ),
-                  child: _createView(),
-                ),
-              ),
-              // sub tiles
-              // Offstage(
-              //   offstage: !_isOpen,
-              //   child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
-              // ),
-              Visibility(
-                visible: _isOpen,
-                maintainState: true,
-                child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   //
   Widget _createView() {
     Widget tile = _tile();
 
     // has badge
-    if (widget.tile.badgeBuilder != null && widget.tile.badgeBuilder!(tile) != null) {
-      tile = widget.tile.badgeBuilder!(tile)!;
-    }
+    final badge = widget.tile.badgeBuilder?.call(tile);
+    if (badge != null) tile = badge;
 
     return tile;
   }
@@ -169,7 +88,7 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
           widget.tile.title,
           style: textStyle?.copyWith(color: textStyle.color ?? (_isOpen ? style.selectedColor : style.color)),
           maxLines: 1,
-          overflow: .ellipsis,
+          overflow: textStyle?.overflow ?? .ellipsis,
         ),
       ),
     );
@@ -208,7 +127,6 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
   List<Widget> _subTiles() {
     return List.generate(widget.tile.subTiles.length, (i) {
       final SideMenuSubTileData subTile = widget.tile.subTiles[i];
-      final SubMenuTileStyle? subStyle = subTile.style;
       final path = [...widget.basePath, i];
       final isSelected = Utils.pathStartsWith(widget.selectedPath, path);
 
@@ -216,13 +134,12 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
           ? SubTileWidget(
               key: ValueKey(path.join('-')),
               subTile: subTile,
-              subStyle: subStyle,
+              subStyle: subTile.style,
               style: style,
               textColor: _getChildColor(isSelected),
               isSelected: isSelected,
-              isCompact: !widget.isMenuOpen,
               onTap: () {
-                subTile.onTap?.call(true);
+                subTile.onTap?.call();
                 widget.onSelectPath(path);
               },
             )
@@ -231,7 +148,7 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
               child: SideMenuSubTile(
                 key: ValueKey(path.join('-')),
                 index: i,
-                isMenuOpen: !widget.isMenuOpen,
+                isMenuOpen: widget.isMenuOpen,
                 tile: subTile.copyWith(style: style),
                 basePath: path,
                 selectedPath: widget.selectedPath,
@@ -248,5 +165,102 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     return condition
         ? style.selectedColor ?? style.selectedTitleStyle?.color ?? ColorScheme.of(context).onPrimary
         : style.color ?? style.titleStyle?.color ?? ColorScheme.of(context).onPrimary;
+  }
+
+  @override
+  void initState() {
+    style = widget.tile.style ?? SubMenuTileStyle();
+
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant SideMenuSubTile oldWidget) {
+    if (oldWidget.tile.style != widget.tile.style) {
+      style = widget.tile.style ?? SubMenuTileStyle();
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isRTL = Utils.isRTL(context);
+
+    return Padding(
+      padding: style.margin,
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          crossAxisAlignment: .start,
+          mainAxisSize: .min,
+          children: [
+            // tile
+            InkWell(
+              onTap: () {
+                widget.onToggle(widget.basePath);
+                widget.tile.onTap?.call();
+              },
+              borderRadius: style.borderRadius,
+              // no hover effect when expanded
+              hoverColor: _isOpen ? Colors.transparent : style.hoverColor,
+              child: Container(
+                height: style.tileHeight,
+                padding: style.padding,
+                decoration:
+                    (_isOpen ? style.selectedDecoration : style.decoration) ??
+                    ShapeDecoration(
+                      shape: RoundedRectangleBorder(borderRadius: style.borderRadius),
+                      color: _isOpen ? style.selectedBackgroundColor : style.backgroundColor,
+                    ),
+                child: _createView(),
+              ),
+            ),
+            // sub tiles
+            // We set maintainState to true to keep sub-menus states (selected sub-tile and opened sub-menu)
+            Visibility(
+              visible: _isOpen,
+              maintainState: true,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: style.borderRadius,
+                  border: Border(
+                    left: isRTL ? BorderSide.none : BorderSide(color: style.color!, width: style.openMenuLineWidth),
+                    right: isRTL ? BorderSide(color: style.color!, width: style.openMenuLineWidth) : BorderSide.none,
+                    bottom: BorderSide(color: style.color!, width: style.openMenuLineWidth),
+                  ),
+                ),
+                child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    // tile identity
+    properties.add(StringProperty('title', widget.tile.title));
+    properties.add(IntProperty('index', widget.index));
+    properties.add(DiagnosticsProperty<List<int>>('basePath', widget.basePath));
+    properties.add(DiagnosticsProperty<List<int>>('selectedPath', widget.selectedPath));
+    // state
+    properties.add(FlagProperty('_isOpen', value: _isOpen, ifTrue: 'expanded', ifFalse: 'collapsed'));
+    properties.add(FlagProperty('isMenuOpen', value: widget.isMenuOpen, ifTrue: 'menu-open'));
+    // structure
+    properties.add(IntProperty('subTileCount', widget.tile.subTiles.length));
+    properties.add(IterableProperty<String>('openNodes', widget.openNodes));
+    // style
+    properties.add(DiagnosticsProperty<BorderRadius?>('borderRadius', style.borderRadius, defaultValue: null));
+    properties.add(DoubleProperty('tileHeight', style.tileHeight));
+    properties.add(DoubleProperty('openMenuLineWidth', style.openMenuLineWidth));
+    // optional features
+    properties.add(FlagProperty('hasBadge', value: widget.tile.badgeBuilder != null, ifTrue: 'has badge'));
+    properties.add(FlagProperty('hasLeading', value: widget.tile.leading != null, ifTrue: 'has leading'));
+    properties.add(FlagProperty('hasSelectedLeading', value: widget.tile.selectedLeading != null, ifTrue: 'has selectedLeading'));
+    properties.add(FlagProperty('hasTrailing', value: widget.tile.trailing != null, ifTrue: 'has trailing'));
   }
 }

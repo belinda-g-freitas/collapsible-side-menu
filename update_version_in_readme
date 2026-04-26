@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+
+PUBSPEC_FILE="pubspec.yaml"
+README_FILE="README.md"
+
+# Extract version from pubspec.yaml
+VERSION=$(grep '^version:' "$PUBSPEC_FILE" | awk '{print $2}')
+
+if [ -z "$VERSION" ]; then
+  echo "Version not found in $PUBSPEC_FILE"
+  exit 1
+fi
+
+# Extract package name (optional, safer than hardcoding)
+PACKAGE_NAME=$(grep '^name:' "$PUBSPEC_FILE" | awk '{print $2}')
+
+if [ -z "$PACKAGE_NAME" ]; then
+  echo "Package name not found in $PUBSPEC_FILE"
+  exit 1
+fi
+
+echo "Updating README with $PACKAGE_NAME: ^$VERSION"
+
+# Replace dependency line inside README
+# Assumes pattern like: package_name: ^x.x.x
+sed -i.bak -E "s/($PACKAGE_NAME:\s*\^)[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/g" "$README_FILE"
+
+rm "$README_FILE.bak"
+
+echo "README updated."

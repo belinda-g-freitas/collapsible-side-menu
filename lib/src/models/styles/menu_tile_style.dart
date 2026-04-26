@@ -25,7 +25,7 @@ class MenuTileStyle extends BaseTileStyle {
     this.subTileStyle,
     super.tileHeight = MenuConstants.tileHeight,
     this.subTileHeight = MenuConstants.subTileHeight,
-    super.horizontalSpacing = 3,
+    super.horizontalSpacing = MenuConstants.horizontalSpacing,
   }) : assert(padding.isNonNegative),
        assert(margin.isNonNegative),
        assert(decoration == null || decoration.debugAssertIsValid()),
@@ -96,9 +96,7 @@ class MenuTileStyle extends BaseTileStyle {
   }
 
   @override
-  String toString() {
-    return 'MenuTileStyle(titleStyle: $titleStyle, selectedTitleStyle: $selectedTitleStyle, color: $color, selectedColor: $selectedColor, hoverColor: $hoverColor, backgroundColor: $backgroundColor, selectedBackgroundColor: $selectedBackgroundColor, borderRadius: $borderRadius, tileHeight: $tileHeight, subTileHeight: $subTileHeight, decoration: $decoration, selectedDecoration: $selectedDecoration, selectedIndicator: $selectedIndicator, padding: $padding, margin: $margin, subTileStyle: $subTileStyle, horizontalSpacing: $horizontalSpacing)';
-  }
+  String toString() => 'MenuTileStyle(subTileHeight: $subTileHeight, subTileStyle: $subTileStyle)';
 
   @override
   bool operator ==(covariant MenuTileStyle other) {

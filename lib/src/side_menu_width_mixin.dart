@@ -3,12 +3,6 @@ import 'enums/menu_behaviour.dart';
 import 'utils/menu_constants.dart';
 
 mixin SideMenuWidthMixin {
-  late MenuBehaviour behaviour;
-  late double currentWidth;
-  late double deviceWidth;
-  late double minWidth;
-  late double maxWidth;
-
   double calculateWidthSize({
     required MenuBehaviour behaviour,
     required double minWidth,
@@ -16,38 +10,39 @@ mixin SideMenuWidthMixin {
     required double currentWidth,
     required double deviceWidth,
   }) {
-    this.behaviour = behaviour;
-    this.minWidth = minWidth;
-    this.maxWidth = maxWidth;
-    this.currentWidth = currentWidth;
-    this.deviceWidth = deviceWidth;
 
     return switch (behaviour) {
-      .open => _open(),
-      .compact => _compact(),
-      .auto => _auto(),
+      .open => _open(currentWidth, minWidth, maxWidth),
+      .compact => _compact(currentWidth, minWidth, maxWidth),
+      .auto => _auto(currentWidth, minWidth, maxWidth, deviceWidth),
     };
   }
 
-  double _auto() {
-    if (_isPossibleWidthChange()) return DeviceScreenType.isDesktop(deviceWidth) ? maxWidth : minWidth;
+  double _auto(double currentWidth, double minWidth, double maxWidth, double deviceWidth) {
+    if (_isPossibleWidthChange(currentWidth, minWidth, maxWidth)) {
+      return DeviceScreenType.isDesktop(deviceWidth) ? maxWidth : minWidth;
+    }
 
     return currentWidth;
   }
 
-  double _open() {
-    if (_isPossibleWidthChange()) return maxWidth;
+  double _open(double currentWidth, double minWidth, double maxWidth) {
+    if (_isPossibleWidthChange(currentWidth, minWidth, maxWidth)) return maxWidth;
 
     return currentWidth;
   }
 
-  double _compact() {
-    if (_isPossibleWidthChange()) return minWidth;
+  double _compact(double currentWidth, double minWidth, double maxWidth) {
+    if (_isPossibleWidthChange(currentWidth, minWidth, maxWidth)) return minWidth;
 
     return currentWidth;
   }
 
-  bool _isPossibleWidthChange() => currentWidth == MenuConstants.zeroWidth || !_isCurrentWidthCustom();
+  bool _isPossibleWidthChange(double currentWidth, double minWidth, double maxWidth) {
+    return currentWidth == MenuConstants.zeroWidth || !_isCurrentWidthCustom(currentWidth, minWidth, maxWidth);
+  }
 
-  bool _isCurrentWidthCustom() => currentWidth != maxWidth && currentWidth != minWidth;
+  bool _isCurrentWidthCustom(double currentWidth, double minWidth, double maxWidth) {
+    return currentWidth != maxWidth && currentWidth != minWidth;
+  }
 }

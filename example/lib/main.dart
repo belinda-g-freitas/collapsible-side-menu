@@ -1,18 +1,24 @@
+import 'package:collapsible_side_menu/collapsible_side_menu.dart';
 import 'package:flutter/material.dart';
 
-import 'package:collapsible_side_menu_example/example_screen.dart';
+import 'package:flutter/rendering.dart';
 
 final themeModeNotifier = ValueNotifier<ThemeMode>(.system);
+const Color appColor = Color(0xFF_292CFF); // Color(0xFF_0D9488); // Color(0xFF_F2A900);
+const RoundedRectangleBorder roundedBorder = .new(borderRadius: .all(.circular(10)));
 
 void main() {
+  // debugPrintRebuildDirtyWidgets = true;
+  // debugProfileBuildsEnabled = true;
+  // debugPrintLayouts = true;
+  // debugRepaintRainbowEnabled = true;
+  // debugPaintSizeEnabled = true;
+
   runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
-
-  static const Color appColor = Color(0xFF_F2A900);
-  static const RoundedRectangleBorder roundedBorder = .new(borderRadius: .all(.circular(10)));
 
   ThemeData _themeData({required Brightness brightness, required Color scaffoldBackgroundColor}) {
     return ThemeData(
@@ -39,14 +45,302 @@ class MainApp extends StatelessWidget {
       builder: (_, mode, __) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Collapsible Side Menu',
+          title: 'Collapsible Side Menu Example',
           color: appColor,
           themeMode: mode,
-          theme: _themeData(brightness: .light, scaffoldBackgroundColor: Color(0xff_f3f3f9)),
-          darkTheme: _themeData(brightness: .dark, scaffoldBackgroundColor: Color(0xff_1a1d21)),
-          home: MediaQuery.withNoTextScaling(child: ExampleScreen()),
+          theme: _themeData(brightness: .light, scaffoldBackgroundColor: const Color(0xff_f3f3f9)),
+          darkTheme: _themeData(brightness: .dark, scaffoldBackgroundColor: const Color(0xff_1a1d21)),
+          home: MediaQuery.withNoTextScaling(child: const ExampleScreen()),
         );
       },
+    );
+  }
+}
+
+//
+class ExampleScreen extends StatefulWidget {
+  const ExampleScreen({super.key});
+
+  @override
+  State<ExampleScreen> createState() => _ExampleScreenState();
+}
+
+class _ExampleScreenState extends State<ExampleScreen> {
+  final _controller = SideMenuController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        crossAxisAlignment: .start,
+        children: [
+          // start menu
+          SideMenu(
+            defaultIndex: 3,
+            defaultBehaviour: .open,
+            toggleButtonStyle: const ToggleButtonStyle(topPosition: 55, iconSize: 16),
+            builder: (_, menuData) {
+              return SideMenuData(
+                header: Column(
+                  crossAxisAlignment: .start,
+                  children: [
+                    Row(
+                      spacing: 10,
+                      mainAxisSize: .min,
+                      children: [
+                        const Flexible(child: CircleAvatar(radius: 22, child: FlutterLogo())),
+                        if (menuData.isOpen)
+                          const Flexible(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: .start,
+                              children: [
+                                Text(
+                                  'Joanna Doe',
+                                  overflow: .ellipsis,
+                                  style: TextStyle(fontWeight: .w500, fontSize: 14.5),
+                                ),
+                                Text(
+                                  'joanna.doe.404@flutter.dev',
+                                  overflow: .ellipsis,
+                                  style: TextStyle(fontSize: 12, fontWeight: .w300),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                    const Divider(thickness: .5),
+                  ],
+                ),
+                footer: Column(
+                  mainAxisAlignment: .end,
+                  crossAxisAlignment: .start,
+                  children: [
+                    const Divider(thickness: .5),
+                    Text('v1.0.1+1', style: TextStyle(fontSize: menuData.isOpen ? 12 : 10)),
+                  ],
+                ),
+                items: [
+                  SideMenuTileData(
+                    title: 'User management',
+                    leading: const Icon(Icons.person_outline, size: 18),
+                    selectedLeading: const Icon(Icons.person, size: 18),
+                    subTiles: [
+                      SideMenuSubTileData(title: 'Customers'),
+                      SideMenuSubTileData(
+                        title: 'Employees',
+                        subTiles: [
+                          SideMenuSubTileData(title: 'Drivers'),
+                          SideMenuSubTileData(title: 'HR'),
+                          SideMenuSubTileData(title: 'Accountants'),
+                          SideMenuSubTileData(title: 'Marketing'),
+                        ],
+                      ),
+                      SideMenuSubTileData(
+                        title: 'Admins',
+                        subTiles: [
+                          SideMenuSubTileData(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sudo')));
+                            },
+                            title: 'Sudo',
+                            leading: const Icon(Icons.shield, size: 18),
+                          ),
+                          SideMenuSubTileData(title: 'Super-admins'),
+                          SideMenuSubTileData(title: 'Admins'),
+                        ],
+                      ),
+                      SideMenuSubTileData(title: 'Salaries', trailing: const Icon(Icons.attach_money, size: 18)),
+                    ],
+                  ),
+                  //
+                  const SideMenuDividerData(),
+                  const SideMenuTitleData(title: 'OTHERS'),
+                  SideMenuTileData(onTap: () {}, title: 'Vehicle', leading: const Icon(Icons.car_rental, size: 18)),
+                  SideMenuTileData(
+                    onTap: () {},
+                    title: 'Conversations',
+                    leading: const Icon(Icons.chat_bubble_outline, size: 18),
+                    selectedLeading: const Icon(Icons.chat_bubble, size: 18),
+                    badgeBuilder: (tile) =>
+                        Badge.count(count: 100, maxCount: 9, offset: Offset(menuData.textDirection == .rtl ? 2 : -2, -4), child: tile),
+                  ),
+                  SideMenuTileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
+                  SideMenuTileData(
+                    onTap: () {
+                      showAdaptiveAboutDialog(context: context);
+                    },
+                    title: 'About',
+                    leading: const Icon(Icons.info_outline, size: 18),
+                    selectedLeading: const Icon(Icons.info, size: 18),
+                  ),
+                  SideMenuTileData(
+                    onTap: () {
+                      showLicensePage(context: context);
+                    },
+                    title: 'Licenses',
+                    leading: const Icon(Icons.copyright_outlined, size: 18),
+                    selectedLeading: const Icon(Icons.copyright, size: 18),
+                  ),
+                ],
+              );
+            },
+          ),
+          // app content
+          Expanded(
+            child: Padding(
+              padding: const .symmetric(horizontal: 15, vertical: 10),
+              child: Column(
+                crossAxisAlignment: .start,
+                spacing: 15,
+                children: [
+                  SegmentedButton<ThemeMode>(
+                    segments: ThemeMode.values.map((e) => ButtonSegment(value: e, label: Text(e.name))).toList(),
+                    selected: {themeModeNotifier.value},
+                    onSelectionChanged: (value) => themeModeNotifier.value = value.first,
+                  ),
+                  const Expanded(child: ColorSchemePreview()),
+                ],
+              ),
+            ),
+          ),
+          // end menu
+          SideMenu(
+            controller: _controller,
+            hasToggleButton: false,
+            defaultIndex: 1,
+            duration: const Duration(milliseconds: 500),
+            menuStyle: SideMenuStyle(textDirection: .rtl, backgroundColor: ColorScheme.of(context).onPrimaryFixed),
+            builder: (_, _) {
+              return SideMenuData(
+                customChild: const FlutterLogo(style: .stacked, size: 40),
+                customChildFlex: 0,
+                customChildPosition: .belowItems,
+                items: [
+                  SideMenuTileData(
+                    onTap: () {
+                      _controller.toggle();
+                    },
+                    title: 'Toggle menu',
+                  ),
+                  SideMenuTileData(title: 'Example 2'),
+                  SideMenuTileData(
+                    onTap: () {
+                      showLicensePage(context: context);
+                    },
+                    title: 'Licenses',
+                    leading: const Icon(Icons.copyright_outlined, size: 18),
+                    selectedLeading: const Icon(Icons.copyright, size: 18),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+//
+class ColorSchemePreview extends StatelessWidget {
+  const ColorSchemePreview({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = ColorScheme.of(context);
+    final colors = <String, Color>{
+      'primary': cs.primary,
+      'onPrimary': cs.onPrimary,
+      'primaryContainer': cs.primaryContainer,
+      'onPrimaryContainer': cs.onPrimaryContainer,
+      'primaryFixed': cs.primaryFixed,
+      'onPrimaryFixed': cs.onPrimaryFixed,
+      'primaryFixedDim': cs.primaryFixedDim,
+      'onPrimaryFixedVariant': cs.onPrimaryFixedVariant,
+      'inversePrimary': cs.inversePrimary,
+      //
+      'secondary': cs.secondary,
+      'onSecondary': cs.onSecondary,
+      'secondaryContainer': cs.secondaryContainer,
+      'onSecondaryContainer': cs.onSecondaryContainer,
+      'secondaryFixed': cs.secondaryFixed,
+      'onSecondaryFixed': cs.onSecondaryFixed,
+      'secondaryFixedDim': cs.secondaryFixedDim,
+      'onSecondaryFixedVariant': cs.onSecondaryFixedVariant,
+      //
+      'tertiary': cs.tertiary,
+      'onTertiary': cs.onTertiary,
+      'tertiaryContainer': cs.tertiaryContainer,
+      'onTertiaryContainer': cs.onTertiaryContainer,
+      'tertiaryFixed': cs.tertiaryFixed,
+      'onTertiaryFixed': cs.onTertiaryFixed,
+      'tertiaryFixedDim': cs.tertiaryFixedDim,
+      'onTertiaryFixedVariant': cs.onTertiaryFixedVariant,
+      //
+      'error': cs.error,
+      'onError': cs.onError,
+      'errorContainer': cs.errorContainer,
+      'onErrorContainer': cs.onErrorContainer,
+      //
+      'surface': cs.surface,
+      'onSurface': cs.onSurface,
+      'inverseSurface': cs.inverseSurface,
+      'onInverseSurface': cs.onInverseSurface,
+      'surfaceContainerLow': cs.surfaceContainerLow,
+      'surfaceContainerLowest': cs.surfaceContainerLowest,
+      'surfaceContainerHigh': cs.surfaceContainerHigh,
+      'surfaceVariant': cs.surfaceContainerHighest,
+      'surfaceBright': cs.surfaceBright,
+      'surfaceDim': cs.surfaceDim,
+      'surfaceTint': cs.surfaceTint,
+      'onSurfaceVariant': cs.onSurfaceVariant,
+      //
+      'outline': cs.outline,
+      'outlineVariant': cs.outlineVariant,
+      //
+      'scrim': cs.scrim,
+      'shadow': cs.shadow,
+    };
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('ColorScheme Preview')),
+      body: ListView.builder(
+        padding: const .all(16),
+        itemCount: colors.entries.length,
+        itemBuilder: (_, i) {
+          final e = colors.entries.elementAt(i);
+          final color = ThemeData.estimateBrightnessForColor(e.value) == .dark ? Colors.white : Colors.black;
+
+          return Container(
+            margin: const .only(bottom: 8),
+            padding: const .symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: e.value,
+              borderRadius: .circular(8),
+              border: .all(color: cs.outline.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    e.key,
+                    style: TextStyle(color: color, fontWeight: .w500),
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    '#${e.value.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                    style: TextStyle(color: color, fontSize: 12, fontFamily: 'monospace'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

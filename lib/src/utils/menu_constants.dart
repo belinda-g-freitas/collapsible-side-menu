@@ -13,6 +13,7 @@ class MenuConstants {
   static const double selectedIndicatorHeight = 20;
   static const double subTileSelectedIndicatorHeight = 15;
   static const double selectedIndicatorWidth = 4;
+  static const double horizontalSpacing = 3;
 
   /// Durations
   static const Duration duration = Duration(milliseconds: 200);

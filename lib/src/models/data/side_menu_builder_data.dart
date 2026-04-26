@@ -1,22 +1,15 @@
 import 'dart:ui' show TextDirection;
 
 class SideMenuBuilderData {
-  SideMenuBuilderData({
-    required this.isOpen,
-    required this.minWidth,
-    required this.maxWidth,
-    required this.currentWidth,
-    required this.textDirection,
-  });
+  SideMenuBuilderData({required this.isOpen, required this.currentWidth, required this.textDirection, this.selectedIndex});
 
   final bool isOpen;
-  final double minWidth;
-  final double maxWidth;
   final double currentWidth;
   final TextDirection textDirection;
+  final int? selectedIndex;
 
   @override
   String toString() {
-    return 'SideMenuBuilderData(isOpen: $isOpen, minWidth: $minWidth, maxWidth: $maxWidth, currentWidth: $currentWidth)';
+    return 'SideMenuBuilderData(isOpen: $isOpen, currentWidth: $currentWidth, textDirection: $textDirection, selectedIndex: $selectedIndex)';
   }
 }
