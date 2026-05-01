@@ -18,7 +18,7 @@ class SubTileWidget extends StatelessWidget {
     required this.onTap,
   });
 
-  final SideMenuSubTileData subTile;
+  final SubTileData subTile;
   final SubMenuTileStyle? subStyle;
   final BaseTileStyle style;
   final bool isSelected;

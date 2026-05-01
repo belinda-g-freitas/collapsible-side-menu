@@ -25,7 +25,7 @@ dev_dependencies:
 
 screenshots:
   - description: 'Mobile'
-  - path: 'assets/'
+  - path: 'assets/collapsible_side_menu_android.mp4'
   - description: 'Desktop'
   - path: 'assets/collapsible_side_menu_desktop.mp4'
   - description: 'Web'

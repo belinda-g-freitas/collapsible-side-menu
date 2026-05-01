@@ -16,7 +16,7 @@ class MenuConstants {
   static const double horizontalSpacing = 3;
 
   /// Durations
-  static const Duration duration = Duration(milliseconds: 200);
+  static const Duration duration = Duration(milliseconds: 400);
 
   /// Colors
   // static const Color selectedColor = AppColors.appColor;

@@ -3,7 +3,7 @@ import '../models/data/side_menu_item_data.dart';
 
 class SideMenuTitle extends StatelessWidget {
   const SideMenuTitle({super.key, required this.data, required this.color});
-  final SideMenuTitleData data;
+  final TitleData data;
   final Color color;
 
   @override

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
 import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, Size, TextAlign, TextStyle, VoidCallback, Widget;
 
 import '../../utils/menu_constants.dart';
@@ -20,8 +21,8 @@ sealed class SideMenuItemData {
   const SideMenuItemData();
 }
 
-class SideMenuTitleData extends SideMenuItemData {
-  const SideMenuTitleData({required this.title, this.titleStyle, this.textAlign, this.padding});
+class TitleData extends SideMenuItemData {
+  const TitleData({required this.title, this.titleStyle, this.textAlign, this.padding});
 
   final String title;
   final TextStyle? titleStyle;
@@ -34,21 +35,27 @@ class SideMenuTitleData extends SideMenuItemData {
   }
 }
 
-class SideMenuDividerData extends SideMenuItemData {
-  const SideMenuDividerData({this.divider = const Divider(), this.padding}) : super();
+class DividerData extends SideMenuItemData {
+  const DividerData({this.divider = const Divider(), this.padding}) : super();
 
   final Widget divider;
   final EdgeInsetsGeometry? padding;
 
-  SideMenuDividerData copyWith({Widget? divider, EdgeInsetsGeometry? padding}) {
-    return SideMenuDividerData(divider: divider ?? this.divider, padding: padding ?? this.padding);
+  DividerData copyWith({Widget? divider, EdgeInsetsGeometry? padding}) {
+    return DividerData(divider: divider ?? this.divider, padding: padding ?? this.padding);
   }
 
   @override
   String toString() => 'SideMenuDividerData(divider: $divider, padding: $padding)';
 }
 
-class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
+class TileData extends SideMenuItemData with _BaseSideMenuData {
+  final Size selectedIndicatorSize;
+  final bool hasSelectedIndicator;
+  final MenuTileStyle? style;
+  final List<SubTileData> subTiles;
+  final String? id;
+
   @override
   final String title;
 
@@ -66,12 +73,8 @@ class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
   @override
   final VoidCallback? onTap;
 
-  final Size selectedIndicatorSize;
-  final bool hasSelectedIndicator;
-  final MenuTileStyle? style;
-  final List<SideMenuSubTileData> subTiles;
-
-  SideMenuTileData({
+  TileData({
+    this.id,
     required this.title,
     this.leading,
     this.selectedLeading,
@@ -84,8 +87,9 @@ class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
     this.hasSelectedIndicator = true,
   });
 
-  SideMenuTileData resolveWith([final MenuTileStyle? style]) {
-    return SideMenuTileData(
+  TileData resolveWith([final MenuTileStyle? style]) {
+    return TileData(
+      id: id,
       title: title,
       leading: leading,
       trailing: trailing,
@@ -99,44 +103,79 @@ class SideMenuTileData extends SideMenuItemData with _BaseSideMenuData {
     );
   }
 
-  SideMenuTileData copyWith({
+  TileData copyWith({
     String? title,
     Widget? leading,
     Widget? selectedLeading,
     Widget? trailing,
-    MenuTileStyle? style,
-    List<SideMenuSubTileData>? subTiles,
     TileBadgeBuilder? badgeBuilder,
     VoidCallback? onTap,
     Size? selectedIndicatorSize,
     bool? hasSelectedIndicator,
+    MenuTileStyle? style,
+    List<SubTileData>? subTiles,
+    String? id,
   }) {
-    return SideMenuTileData(
+    return TileData(
       title: title ?? this.title,
       leading: leading ?? this.leading,
       selectedLeading: selectedLeading ?? this.selectedLeading,
       trailing: trailing ?? this.trailing,
-      style: style ?? this.style,
-      subTiles: subTiles ?? this.subTiles,
       badgeBuilder: badgeBuilder ?? this.badgeBuilder,
       onTap: onTap ?? this.onTap,
       selectedIndicatorSize: selectedIndicatorSize ?? this.selectedIndicatorSize,
       hasSelectedIndicator: hasSelectedIndicator ?? this.hasSelectedIndicator,
+      style: style ?? this.style,
+      subTiles: subTiles ?? this.subTiles,
+      id: id ?? this.id,
     );
   }
 
   @override
   String toString() {
-    return 'SideMenuTileData(title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap, selectedIndicatorSize: $selectedIndicatorSize, hasSelectedIndicator: $hasSelectedIndicator, style: $style, subTiles: $subTiles)';
+    return 'SideMenuTileData(title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap, selectedIndicatorSize: $selectedIndicatorSize, hasSelectedIndicator: $hasSelectedIndicator, style: $style, subTiles: $subTiles, id: $id)';
+  }
+
+  @override
+  bool operator ==(covariant TileData other) {
+    if (identical(this, other)) return true;
+
+    return other.title == title &&
+        other.leading == leading &&
+        other.selectedLeading == selectedLeading &&
+        other.trailing == trailing &&
+        other.badgeBuilder == badgeBuilder &&
+        other.onTap == onTap &&
+        other.selectedIndicatorSize == selectedIndicatorSize &&
+        other.hasSelectedIndicator == hasSelectedIndicator &&
+        other.style == style &&
+        listEquals(other.subTiles, subTiles) &&
+        other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    return title.hashCode ^
+        leading.hashCode ^
+        selectedLeading.hashCode ^
+        trailing.hashCode ^
+        badgeBuilder.hashCode ^
+        onTap.hashCode ^
+        selectedIndicatorSize.hashCode ^
+        hasSelectedIndicator.hashCode ^
+        style.hashCode ^
+        subTiles.hashCode ^
+        id.hashCode;
   }
 }
 
-/// Can only be called from [SideMenuTileData.subTiles]
+/// Can only be called from [TileData.subTiles]
 ///
 /// Will be ignored if called directly inside [SideMenuData.items]
-class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
-  final List<SideMenuSubTileData> subTiles;
+class SubTileData extends SideMenuItemData with _BaseSideMenuData {
+  final List<SubTileData> subTiles;
   final SubMenuTileStyle? style;
+  final String? id;
 
   @override
   final String title;
@@ -156,7 +195,7 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
   @override
   VoidCallback? onTap;
 
-  SideMenuSubTileData({
+  SubTileData({
     required this.title,
     this.leading,
     this.selectedLeading,
@@ -165,10 +204,12 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
     this.subTiles = const [],
     this.badgeBuilder,
     this.onTap,
+    this.id,
   });
 
-  SideMenuSubTileData resolveWith([final SubMenuTileStyle? style]) {
-    return SideMenuSubTileData(
+  SubTileData resolveWith([final SubMenuTileStyle? style]) {
+    return SubTileData(
+      id: id,
       title: title,
       leading: leading,
       trailing: trailing,
@@ -180,24 +221,25 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
     );
   }
 
-  SideMenuSubTileData copyWith({
+  SubTileData copyWith({
+    List<SubTileData>? subTiles,
+    SubMenuTileStyle? style,
+    String? id,
     String? title,
     Widget? leading,
     Widget? selectedLeading,
     Widget? trailing,
-    SubMenuTileStyle? style,
-    List<SideMenuSubTileData>? subTiles,
     TileBadgeBuilder? badgeBuilder,
     VoidCallback? onTap,
-    bool? hasSelectedIndicator,
   }) {
-    return SideMenuSubTileData(
+    return SubTileData(
+      subTiles: subTiles ?? this.subTiles,
+      style: style ?? this.style,
+      id: id ?? this.id,
       title: title ?? this.title,
       leading: leading ?? this.leading,
       selectedLeading: selectedLeading ?? this.selectedLeading,
       trailing: trailing ?? this.trailing,
-      style: style ?? this.style,
-      subTiles: subTiles ?? this.subTiles,
       badgeBuilder: badgeBuilder ?? this.badgeBuilder,
       onTap: onTap ?? this.onTap,
     );
@@ -205,6 +247,34 @@ class SideMenuSubTileData extends SideMenuItemData with _BaseSideMenuData {
 
   @override
   String toString() {
-    return 'SideMenuSubTileData(subTiles: $subTiles, style: $style, title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap)';
+    return 'SideMenuSubTileData(subTiles: $subTiles, style: $style, id: $id, title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap)';
+  }
+
+  @override
+  bool operator ==(covariant SubTileData other) {
+    if (identical(this, other)) return true;
+
+    return listEquals(other.subTiles, subTiles) &&
+        other.style == style &&
+        other.id == id &&
+        other.title == title &&
+        other.leading == leading &&
+        other.selectedLeading == selectedLeading &&
+        other.trailing == trailing &&
+        other.badgeBuilder == badgeBuilder &&
+        other.onTap == onTap;
+  }
+
+  @override
+  int get hashCode {
+    return subTiles.hashCode ^
+        style.hashCode ^
+        id.hashCode ^
+        title.hashCode ^
+        leading.hashCode ^
+        selectedLeading.hashCode ^
+        trailing.hashCode ^
+        badgeBuilder.hashCode ^
+        onTap.hashCode;
   }
 }

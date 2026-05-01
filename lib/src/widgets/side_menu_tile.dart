@@ -25,7 +25,7 @@ class SideMenuTile extends StatefulWidget {
     required this.openNodes,
   });
 
-  final SideMenuTileData tile;
+  final TileData tile;
   final bool isSelected;
   final bool isMenuOpen;
   final double minWidth;
@@ -43,26 +43,51 @@ class SideMenuTile extends StatefulWidget {
 class _SideMenuTileState extends State<SideMenuTile> {
   static const double _anchorHorizPadding = 10;
   final MenuController _menuController = MenuController();
-  late MenuTileStyle style;
+  late MenuTileStyle _style;
   late Color _anchorForegroundColor;
+  late List<int> _nodeKey;
+  late TileData tile;
+  late List<SubTileData> subTiles;
+  bool _derivedValuesInitialized = false;
 
   bool _isSelectedPath(List<int> path) => Utils.pathStartsWith(widget.selectedPath, path);
 
-  bool get _isSubTileSelected => widget.openNodes.contains(widget.basePath.join('-'));
+  bool get _isSubTileSelected => widget.openNodes.contains(_nodeKey.join('-'));
 
   void _updateStyle() {
-    style = widget.tile.style!;
-    _anchorForegroundColor = style.color ?? style.titleStyle?.color ?? ColorScheme.of(context).onPrimary;
+    final newStyle = tile.style!;
+    if (_derivedValuesInitialized && _style == newStyle) return;
+
+    _derivedValuesInitialized = true;
+    _style = tile.style!;
+    _anchorForegroundColor = _style.color ?? _style.titleStyle?.color ?? ColorScheme.of(context).onPrimary;
   }
 
   //
-  Widget _collapsedSubTile(SideMenuSubTileData subTile, List<int> path) {
+  Widget _createView() {
+    final Color color = _getChildColor(widget.isSelected);
+    Widget view = _tile(color);
+
+    // has badge
+    final badge = tile.badgeBuilder?.call(view);
+    if (badge != null) view = badge;
+
+    // has selected indicator
+    if (widget.isSelected && tile.hasSelectedIndicator) {
+      view = _selectedLine(color, child: view);
+    }
+
+    return view;
+  }
+
+  //
+  Widget _collapsedSubTile(SubTileData subTile, List<int> path) {
     final isSelected = _isSelectedPath(path);
 
     return SubTileWidget(
       subTile: subTile,
       subStyle: subTile.style,
-      style: style,
+      style: _style,
       textColor: _getChildColor(isSelected),
       isSelected: isSelected,
       onTap: () {
@@ -74,23 +99,6 @@ class _SideMenuTileState extends State<SideMenuTile> {
   }
 
   //
-  Widget _createView() {
-    final Color color = _getChildColor(widget.isSelected);
-    Widget tile = _tile(color);
-
-    // has badge
-    final badge = widget.tile.badgeBuilder?.call(tile);
-    if (badge != null) tile = badge;
-
-    // has selected indicator
-    if (widget.isSelected && widget.tile.hasSelectedIndicator) {
-      tile = _selectedLine(color, child: tile);
-    }
-
-    return tile;
-  }
-
-  //
   List<Widget> _collapsedSubTiles(Color textColor, List<int> parentPath) {
     return [
       Padding(
@@ -99,15 +107,15 @@ class _SideMenuTileState extends State<SideMenuTile> {
           crossAxisAlignment: .start,
           children: [
             Text(
-              widget.tile.title,
+              tile.title,
               style: TextTheme.of(context).labelMedium?.copyWith(color: textColor, fontWeight: .w400),
             ),
             Divider(color: textColor, thickness: 1, height: 1),
           ],
         ),
       ),
-      ...List.generate(widget.tile.subTiles.length, (i) {
-        final subTile = widget.tile.subTiles[i];
+      ...List.generate(subTiles.length, (i) {
+        final subTile = subTiles[i];
         final path = [...parentPath, i];
 
         return subTile.subTiles.isEmpty ? _collapsedSubTile(subTile, path) : _buildCollapsedSubTile(subTile, path, textColor);
@@ -115,7 +123,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
     ];
   }
 
-  Widget _buildCollapsedSubTile(SideMenuSubTileData tile, List<int> parentPath, Color textColor) {
+  Widget _buildCollapsedSubTile(SubTileData tile, List<int> parentPath, Color textColor) {
     TextStyle? textStyle;
 
     return SubmenuButton(
@@ -138,7 +146,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 key: ValueKey(path.join('-')),
                 index: i,
                 isMenuOpen: widget.isMenuOpen,
-                tile: subTile.resolveWith((subTile.style ?? SubMenuTileStyle()).merge(style)),
+                tile: subTile.resolveWith((subTile.style ?? SubMenuTileStyle()).merge(_style)),
                 basePath: path,
                 selectedPath: widget.selectedPath,
                 onSelectPath: widget.onSelectPath,
@@ -152,8 +160,8 @@ class _SideMenuTileState extends State<SideMenuTile> {
 
   //
   List<Widget> _subTiles(List<int> parentPath) {
-    return List.generate(widget.tile.subTiles.length, (i) {
-      final subTile = widget.tile.subTiles[i];
+    return List.generate(subTiles.length, (i) {
+      final subTile = subTiles[i];
       final path = [...parentPath, i];
       final isSelected = _isSelectedPath(path);
 
@@ -162,7 +170,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
               key: ValueKey(path.join('-')),
               subTile: subTile,
               subStyle: subTile.style,
-              style: style,
+              style: _style,
               textColor: _getChildColor(isSelected),
               isSelected: isSelected,
               onTap: () {
@@ -176,7 +184,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 key: ValueKey(path.join('-')),
                 index: i,
                 isMenuOpen: widget.isMenuOpen,
-                tile: subTile.resolveWith((subTile.style ?? SubMenuTileStyle()).merge(style)),
+                tile: subTile.resolveWith((subTile.style ?? SubMenuTileStyle()).merge(_style)),
                 basePath: path,
                 selectedPath: widget.selectedPath,
                 onSelectPath: widget.onSelectPath,
@@ -192,7 +200,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
     final Widget? leading = _leading(color);
 
     return Row(
-      spacing: style.horizontalSpacing,
+      spacing: _style.horizontalSpacing,
       children: [
         ?leading,
         ?_title(color, hasLeading: leading != null),
@@ -203,7 +211,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
 
   //
   Widget? _leading(Color color) {
-    final Widget? selectedLeading = widget.isSelected && widget.tile.selectedLeading != null ? widget.tile.selectedLeading : widget.tile.leading;
+    final Widget? selectedLeading = widget.isSelected && tile.selectedLeading != null ? tile.selectedLeading : tile.leading;
 
     return selectedLeading != null
         ? Expanded(
@@ -217,7 +225,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
         : Expanded(
             child: Center(
               child: Text(
-                widget.tile.title[0],
+                tile.title[0],
                 style: TextStyle(fontWeight: .w600, color: color),
               ),
             ),
@@ -226,14 +234,14 @@ class _SideMenuTileState extends State<SideMenuTile> {
 
   Widget? _title(Color color, {required bool hasLeading}) {
     if (widget.isMenuOpen) {
-      final TextStyle? textStyle = (widget.isSelected ? style.selectedTitleStyle : style.titleStyle) ?? TextTheme.of(context).bodySmall;
+      final TextStyle? textStyle = (widget.isSelected ? _style.selectedTitleStyle : _style.titleStyle) ?? TextTheme.of(context).bodySmall;
 
       return Expanded(
         flex: 5,
         child: Padding(
           padding: hasLeading ? .zero : const .fromSTEB(10, 0, 0, 0),
           child: Text(
-            widget.tile.title,
+            tile.title,
             style: textStyle?.copyWith(color: textStyle.color ?? color),
             maxLines: 1,
             overflow: textStyle?.overflow ?? .ellipsis,
@@ -252,22 +260,22 @@ class _SideMenuTileState extends State<SideMenuTile> {
         child: Icon(_isSubTileSelected ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 14, color: color),
       );
 
-      if (widget.tile.trailing != null) {
+      if (tile.trailing != null) {
         final Widget trailing = Expanded(
           child: SizedBox(
             height: double.maxFinite,
-            child: ColoredContent(color: color, child: widget.tile.trailing!),
+            child: ColoredContent(color: color, child: tile.trailing!),
           ),
         );
 
         return [
           trailing,
           // icon indicating tile has sub-tiles
-          if (widget.tile.subTiles.isNotEmpty) openIcon,
+          if (subTiles.isNotEmpty) openIcon,
         ];
       }
 
-      if (widget.tile.subTiles.isNotEmpty) return [openIcon];
+      if (subTiles.isNotEmpty) return [openIcon];
     }
 
     return null;
@@ -276,7 +284,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
   //
   Widget _selectedLine(Color color, {required Widget child}) {
     // get decoration if not null & set color if null
-    final Decoration? decoration = switch (style.selectedIndicator) {
+    final Decoration? decoration = switch (_style.selectedIndicator) {
       BoxDecoration d when d.color == null => d.copyWith(color: color),
       ShapeDecoration d when d.color == null => ShapeDecoration(
         color: color,
@@ -285,14 +293,14 @@ class _SideMenuTileState extends State<SideMenuTile> {
         gradient: d.gradient,
         image: d.image,
       ),
-      _ => style.selectedIndicator,
+      _ => _style.selectedIndicator,
     };
 
     // selected line
     final Widget line = decoration != null
-        ? Container(constraints: BoxConstraints.loose(widget.tile.selectedIndicatorSize), decoration: decoration)
+        ? Container(constraints: BoxConstraints.loose(tile.selectedIndicatorSize), decoration: decoration)
         : Container(
-            constraints: BoxConstraints.loose(widget.tile.selectedIndicatorSize),
+            constraints: BoxConstraints.loose(tile.selectedIndicatorSize),
             decoration: BoxDecoration(borderRadius: MenuConstants.borderRadius, color: color),
           );
 
@@ -302,28 +310,35 @@ class _SideMenuTileState extends State<SideMenuTile> {
   // the color of leading, title and trailing when selected or not
   Color _getChildColor(bool condition) {
     return condition
-        ? style.selectedColor ?? style.selectedTitleStyle?.color ?? ColorScheme.of(context).onPrimary
-        : style.color ?? style.titleStyle?.color ?? ColorScheme.of(context).onPrimary;
+        ? _style.selectedColor ?? _style.selectedTitleStyle?.color ?? Colors.white
+        : _style.color ?? _style.titleStyle?.color ?? Colors.white;
   }
 
   @override
   void initState() {
     super.initState();
-    _updateStyle();
+
+    _nodeKey = widget.basePath;
+    tile = widget.tile;
+    subTiles = tile.subTiles;
+    _updateStyle(); // important it comes after tile and subtiles
   }
 
   @override
   void didChangeDependencies() {
-    _updateStyle();
-
     super.didChangeDependencies();
+
+    _updateStyle();
   }
 
   @override
   void didUpdateWidget(covariant SideMenuTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.tile.style != widget.tile.style) _updateStyle();
+    if (!listEquals(oldWidget.basePath, widget.basePath)) _nodeKey = widget.basePath;
+    if (oldWidget.tile != widget.tile) tile = widget.tile;
+    if (!listEquals(oldWidget.tile.subTiles, widget.tile.subTiles)) subTiles = tile.subTiles;
+    if (oldWidget.tile.style != widget.tile.style) _updateStyle(); // important it comes after tile and subtiles
   }
 
   @override
@@ -333,12 +348,12 @@ class _SideMenuTileState extends State<SideMenuTile> {
     final bool isRTL = Utils.isRTL(context);
     final Widget view = _createView();
     final Widget viewWithTooltip = Tooltip(
-      message: widget.tile.title,
+      message: tile.title,
       enableTapToDismiss: false,
       textStyle: TextStyle(color: colorScheme.onSurface, fontWeight: .w400),
       decoration: BoxDecoration(
         color: colorScheme.surface.withAlpha(233),
-        borderRadius: style.borderRadius,
+        borderRadius: _style.borderRadius,
         border: .all(color: colorScheme.onSurface, width: .3),
       ),
       positionDelegate: (position) {
@@ -346,33 +361,33 @@ class _SideMenuTileState extends State<SideMenuTile> {
             ? Offset(position.target.dx - (position.tooltipSize.width + widget.minWidth / 2), position.target.dy - position.tooltipSize.height / 2)
             : Offset(position.target.dx + widget.minWidth / 2, position.target.dy - position.tooltipSize.height / 2);
       },
-      constraints: BoxConstraints(minHeight: style.tileHeight / 1.5),
+      constraints: BoxConstraints(minHeight: _style.tileHeight / 1.5),
       child: view,
     );
     final Widget singleTile = InkWell(
       onTap: () {
-        widget.tile.onTap?.call();
+        tile.onTap?.call();
 
-        if (widget.tile.subTiles.isEmpty) {
-          widget.onSelectPath(widget.basePath);
+        if (subTiles.isEmpty) {
+          widget.onSelectPath(_nodeKey);
         } else {
-          widget.onToggle(widget.basePath);
+          widget.onToggle(_nodeKey);
         }
       },
-      borderRadius: style.borderRadius,
-      hoverColor: style.hoverColor,
+      borderRadius: _style.borderRadius,
+      hoverColor: _style.hoverColor,
       child: Container(
-        height: style.tileHeight,
-        padding: style.padding,
+        height: _style.tileHeight,
+        padding: _style.padding,
         decoration:
-            (widget.isSelected ? style.selectedDecoration : style.decoration) ??
+            (widget.isSelected ? _style.selectedDecoration : _style.decoration) ??
             ShapeDecoration(
-              shape: RoundedRectangleBorder(borderRadius: style.borderRadius),
-              color: widget.isSelected ? style.selectedBackgroundColor ?? colorScheme.secondaryContainer : style.backgroundColor,
+              shape: RoundedRectangleBorder(borderRadius: _style.borderRadius),
+              color: widget.isSelected ? _style.selectedBackgroundColor ?? colorScheme.secondaryContainer : _style.backgroundColor,
             ),
         child: widget.isMenuOpen
             ? view
-            : widget.tile.subTiles.isEmpty
+            : subTiles.isEmpty
             ? viewWithTooltip
             : MenuTheme(
                 data: MenuThemeData(
@@ -388,11 +403,11 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 child: MenuAnchor(
                   controller: _menuController,
                   clipBehavior: .antiAlias,
-                  menuChildren: _collapsedSubTiles(_anchorForegroundColor, widget.basePath),
+                  menuChildren: _collapsedSubTiles(_anchorForegroundColor, _nodeKey),
                   alignmentOffset: Offset(widget.minWidth / 7, 0),
                   style: menuTheme.style?.copyWith(alignment: .topEnd),
                   child: InkWell(
-                    borderRadius: style.borderRadius,
+                    borderRadius: _style.borderRadius,
                     onTap: () => _menuController.isOpen ? _menuController.close() : _menuController.open(),
                     child: viewWithTooltip,
                   ),
@@ -402,10 +417,10 @@ class _SideMenuTileState extends State<SideMenuTile> {
     );
 
     return Padding(
-      padding: style.margin,
+      padding: _style.margin,
       child: Material(
         color: Colors.transparent,
-        child: widget.tile.subTiles.isEmpty
+        child: subTiles.isEmpty
             ? singleTile
             : Column(
                 crossAxisAlignment: .start,
@@ -420,17 +435,13 @@ class _SideMenuTileState extends State<SideMenuTile> {
                     maintainState: true,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        borderRadius: style.borderRadius,
+                        borderRadius: _style.borderRadius,
                         border: Border(
-                          left: isRTL ? BorderSide.none : BorderSide(color: style.color!, width: style.openMenuLineWidth),
-                          right: isRTL ? BorderSide(color: style.color!, width: style.openMenuLineWidth) : BorderSide.none,
+                          left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
+                          right: isRTL ? BorderSide(color: _style.color!, width: _style.openMenuLineWidth) : BorderSide.none,
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: .start,
-                        mainAxisSize: .min,
-                        children: [const SizedBox(height: 2), ..._subTiles(widget.basePath)],
-                      ),
+                      child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles(_nodeKey)]),
                     ),
                   ),
                 ],
@@ -443,29 +454,29 @@ class _SideMenuTileState extends State<SideMenuTile> {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     // tile identity
-    properties.add(StringProperty('title', widget.tile.title));
-    properties.add(DiagnosticsProperty<List<int>>('basePath', widget.basePath));
+    properties.add(StringProperty('title', tile.title));
+    properties.add(DiagnosticsProperty<List<int>>('basePath', _nodeKey));
     properties.add(DiagnosticsProperty<List<int>>('selectedPath', widget.selectedPath));
     // state
     properties.add(FlagProperty('isSelected', value: widget.isSelected, ifTrue: 'selected'));
     properties.add(FlagProperty('isMenuOpen', value: widget.isMenuOpen, ifTrue: 'open', ifFalse: 'collapsed'));
     properties.add(FlagProperty('_isSubTileSelected', value: _isSubTileSelected, ifTrue: 'subtile-expanded'));
     // structure
-    properties.add(IntProperty('subTileCount', widget.tile.subTiles.length));
+    properties.add(IntProperty('subTileCount', subTiles.length));
     properties.add(IterableProperty<String>('openNodes', widget.openNodes));
     // layout
     properties.add(DoubleProperty('minWidth', widget.minWidth));
     properties.add(ColorProperty('sideMenuBackgroundColor', widget.sideMenuBackgroundColor));
     // style (only when available — style is assigned in build)
     if (mounted) {
-      properties.add(DiagnosticsProperty<BorderRadius?>('borderRadius', style.borderRadius, defaultValue: null));
-      properties.add(DoubleProperty('tileHeight', style.tileHeight));
+      properties.add(DiagnosticsProperty<BorderRadius?>('borderRadius', _style.borderRadius, defaultValue: null));
+      properties.add(DoubleProperty('tileHeight', _style.tileHeight));
       properties.add(ColorProperty('resolvedForegroundColor', _anchorForegroundColor));
     }
     // optional features
-    properties.add(FlagProperty('hasBadge', value: widget.tile.badgeBuilder != null, ifTrue: 'has badge'));
-    properties.add(FlagProperty('hasSelectedIndicator', value: widget.tile.hasSelectedIndicator, ifTrue: 'has indicator'));
-    properties.add(FlagProperty('hasLeading', value: widget.tile.leading != null, ifTrue: 'has leading'));
-    properties.add(FlagProperty('hasTrailing', value: widget.tile.trailing != null, ifTrue: 'has trailing'));
+    properties.add(FlagProperty('hasBadge', value: tile.badgeBuilder != null, ifTrue: 'has badge'));
+    properties.add(FlagProperty('hasSelectedIndicator', value: tile.hasSelectedIndicator, ifTrue: 'has indicator'));
+    properties.add(FlagProperty('hasLeading', value: tile.leading != null, ifTrue: 'has leading'));
+    properties.add(FlagProperty('hasTrailing', value: tile.trailing != null, ifTrue: 'has trailing'));
   }
 }

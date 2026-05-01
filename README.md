@@ -1,35 +1,23 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
 [![pub package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dartlang.org/packages/collapsible_side_menu)
-[![codecov](https://codecov.io/gh/belinda-g-freitas/collapsible_side_menu/branch/main/graph/badge.svg?token=XBhsIZBbZG)](https://codecov.io/gh/belinda-g-freitas/collapsible_side_menu)
-<a href="https://pub.dev/packages/collapsible_side_menu"><img alt="GitHub Repo stars" src="https://github.com/belinda-g-freitas/collapsible-side-menu"></a>
-<a href="https://github.com/belinda-g-freitas/collapsible-side-menu/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/belinda-g-freitas/contributors/belinda-g-freitas/collapsible_side_menu"></a>
 <a href="https://githubc.com/belinda-g-freitas/collapsible_side_menu/issues?q=is%3Aissue+is%3Aclosed"><img src="https://img.shields.io/github/issues-closed-raw/belinda-g-freitas/collapsible_side_menu" alt="GitHub closed issues"></a>
 <a href="https://github.com/belinda-g-freitas/collapsible_side_menu"><img src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible_side_menu?logo=github&labelColor=333940" alt="contributors"></a>
-![GitHub Sponsors](https://img.shields.io/github/sponsors/belinda-g-freitas)
 
 # collapsible_side_menu
 
 `collapsible_side_menu` is a highly customizable Flutter package for building a collapsible side menu, with text direction (LTR & RTL) and sub-menu features.
 
-| Mobile |                                                                           Desktop                                                                           |                                                                                                            Web                                                                                                            |
-| :----: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| TODO:  | <video controls><source src="https://github.com/belinda-g-freitas/collapsible_side_menu/assets/collapsible_side_menu_desktop.mp4" type="video/mp4"></video> | <a href="https://github.com/belinda-g-freitas/collapsible_side_menu/assets/collapsible_side_menu_web.png"><img src="https://github.com/belinda-g-freitas/collapsible_side_menu/assets/collapsible_side_menu_web.png"></a> |
+| Mobile |                                                                                 Desktop                                                                                 |                                                                                                                        Web                                                                                                                        |
+| :----: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <video controls><source src="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_android.mp4" type="video/mp4"></video>  | <video controls><source src="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_desktop.mp4" type="video/mp4"></video> | <a href="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_web.png"><img src="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_web.png"></a> |
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- set menu animation duration
+- set menu behaviour
+- set menu text direction
+- set toggle button and it's look
+- add tiles and and their sub-tiles
+- customize menu, tile and sub-tile look
 
 ## Quick start
 
@@ -42,7 +30,7 @@ dependencies:
   collapsible_side_menu: ^1.0.0+1
 ```
 
-OR
+or run
 
 ```sh
 flutter pub add collapsible_side_menu
@@ -179,11 +167,10 @@ SideMenu(
 | SideMenuController                 | Class  |  Data   |                                                                   Menu controller |
 | SideMenuBuilderData                | Class  | Builder |                                                                      Menu builder |
 | SideMenuData                       | Class  |  Data   |                                                            Data to build the menu |
-| SideMenuItemAnimationData          | Class  |  Data   |       Add custom animation to menu elements (header, custom child, items, footer) |
 | SideMenuTitleData                  | Class  |  Data   | Add a simple text with custom style (with no background or tap callback) to items |
 | SideMenuDividerData                | Class  |  Data   |                                              Add a custom divider widget to items |
-| SideMenuTileData                   | Class  |  Data   |                                                              Data to build a tile |
-| SideMenuSubTileData                | Class  |  Data   |                                                          Data to build a sub-tile |
+| SideMenuTileData                   | Class  |  Data   |                                                               Add a tile to items |
+| SideMenuSubTileData                | Class  |  Data   |                                         Add a sub-tile to tile (SideMenuTileData) |
 | TileBadgeBuilder                   | Class  | Builder |                                                   Data to build a badge on a tile |
 | CustomChildPosition                |  Enum  |  Enum   |                                                      Position of the custom child |
 
@@ -463,7 +450,7 @@ SideMenu(
   <tr>
     <td>topPosition</td>
     <td>double</td>
-    <td>20</td>
+    <td>20.0</td>
   </tr>
   <tr>
     <td>opacity</td>
@@ -473,18 +460,21 @@ SideMenu(
   <tr>
     <td>iconSize</td>
     <td>double</td>
-    <td>20</td>
+    <td>20.0</td>
   </tr>
   <tr>
     <td>icon</td>
     <td>IconData?</td>
     <td>null</td>
   </tr>
+  <tr>
+    <td>backgroundColor</td>
+    <td>Color?</td>
+    <td>ColorScheme.of(context).inversePrimary</td>
+  </tr>
 
 </table>
 
-## Additional information
+## ⚠️ Warning
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+This package was only tested on Android, Linux and web so feedback is needed for other platforms.
