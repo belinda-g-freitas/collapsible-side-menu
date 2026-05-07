@@ -463,6 +463,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 decoration: BoxDecoration(
                   borderRadius: _style.borderRadius,
                   border: Border(
+                    top: BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
                     left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
                     right: isRTL ? BorderSide(color: _style.color!, width: _style.openMenuLineWidth) : BorderSide.none,
                   ),
