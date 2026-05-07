@@ -19,13 +19,16 @@ class _ToggleButtonState extends State<ToggleButton> {
   static const IconData _leftIcon = Icons.keyboard_double_arrow_left_rounded, _rightIcon = Icons.keyboard_double_arrow_right_rounded;
   late Widget _icon;
   late ToggleButtonStyle _buttonStyle;
-  bool _visible = false;
+  bool _visible = false, _isStyleInitialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    _buttonStyle = widget.style ?? const ToggleButtonStyle().copyWith(iconColor: IconTheme.of(context).color);
+    if (!_isStyleInitialized) {
+      _isStyleInitialized = true;
+      _buttonStyle = widget.style ?? const ToggleButtonStyle().copyWith(iconColor: IconTheme.of(context).color);
+    }
   }
 
   @override

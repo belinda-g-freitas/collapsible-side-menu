@@ -1,5 +1,8 @@
+typedef VoidCallback = void Function();
+
 class SideMenuController {
-  late void Function() open;
-  late void Function() close;
-  late void Function() toggle;
+  late VoidCallback open;
+  late VoidCallback close;
+  late VoidCallback toggle;
+  late bool Function() isCollapsed;
 }

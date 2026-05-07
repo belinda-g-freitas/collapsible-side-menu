@@ -1,16 +1,18 @@
+import 'dart:async' show Timer;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'enums/auto_open_from.dart';
 import 'enums/menu_behaviour.dart';
 import 'models/data/custom_menu_child.dart';
-import 'models/data/side_menu_builder.dart';
-import 'models/data/side_menu_item_data.dart';
+import 'models/data/side_menu_item.dart';
 import 'models/side_menu_controller.dart';
 import 'models/styles/menu_tile_style.dart';
 import 'models/styles/side_menu_style.dart';
 import 'models/styles/sub_menu_tile_style.dart';
 import 'models/styles/toggle_button_style.dart';
-import 'side_menu_width_mixin.dart';
+import 'side_menu_state_mixin.dart';
 import 'utils/menu_constants.dart';
 import 'widgets/colored_content.dart';
 import 'widgets/side_menu_divider.dart';
@@ -18,14 +20,31 @@ import 'widgets/side_menu_tile.dart';
 import 'widgets/side_menu_title.dart';
 import 'widgets/toggle_button.dart';
 
-typedef MenuBuilder = List<SideMenuItemData> Function(BuildContext context, SideMenuBuilder data);
+/// Signature for the `header` and `footer` widgets
+///
+/// It exposes the menu state (opened/collapsed);
+/// in case you want to adapt the header or footer but also don't want to use a [controller]
 typedef MenuHeaderBuilder = Widget Function(BuildContext context, bool isOpen);
 
+@immutable
 class _SelectionState {
   const _SelectionState({this.index, this.path = const []});
 
+  /// Current selected index
   final int? index;
+
+  /// Path to detect which sub-tile is active
   final List<int> path;
+
+  @override
+  bool operator ==(covariant _SelectionState other) {
+    if (identical(this, other)) return true;
+
+    return other.index == index && listEquals(other.path, path);
+  }
+
+  @override
+  int get hashCode => Object.hash(index, Object.hashAll(path));
 }
 
 //
@@ -35,100 +54,149 @@ class CollapsibleSideMenu extends StatefulWidget {
     this.header,
     this.footer,
     this.customMenuChild,
+    this.items = const [],
     this.spacerAfterItems,
-    required this.builder,
+    this.onIndexChanged,
     this.controller,
     this.defaultBehaviour = .auto,
+    this.autoFrom = .tablet,
     this.minWidth = MenuConstants.minWidth,
     this.maxWidth = MenuConstants.maxWidth,
     this.hasToggleButton = true,
     this.toggleButtonStyle,
     this.duration = MenuConstants.duration,
+    this.animationCurve = Curves.linear,
     this.menuStyle,
     this.defaultIndex,
   }) : assert(minWidth >= 0.0),
        assert(maxWidth > minWidth),
        assert(toggleButtonStyle != null ? hasToggleButton : true);
 
+  /// Menu header widget
   final MenuHeaderBuilder? header;
+
+  /// Menu footer widget
   final MenuHeaderBuilder? footer;
+
+  /// Menu custom child
+  ///
+  /// You are responsible of making it fit whatever the menu state
   final CustomMenuChild? customMenuChild;
+
+  /// Menu elements
+  final List<SideMenuItem> items;
+
+  /// A spacer to insert after items
   final Spacer? spacerAfterItems;
-  final MenuBuilder builder;
+
+  /// Notifeier on selected index changes
+  final ValueChanged<int>? onIndexChanged;
+
+  /// Menu controller
   final SideMenuController? controller;
+
+  /// Menu state on init or when screen width changes
+  ///
+  /// If [MenuBehaviour.auto], the menu opens when the screen is wide enough and collapse when the screen is narrow.
+  ///
+  /// If [MenuBehaviour.collapse], the menu collapses on screen width changes.
+  /// Menu width is [minWidth] then.
+  ///
+  /// If [MenuBehaviour.open], the menu opens on screen width changes.
+  /// Menu width is [maxWidth] then.
   final MenuBehaviour defaultBehaviour;
+
+  /// [AutoOpenFrom.tablet], opens menu from tablets breakpoint width
+  ///
+  /// [AutoOpenFrom.desktop], opens menu from desktop breakpoint width
+  final AutoOpenFrom autoFrom;
+
+  /// Menu min width (when collapsed)
   final double minWidth;
+
+  /// Menu max width (when open)
   final double maxWidth;
+
+  /// Whether to show the toggle button on the menu
   final bool hasToggleButton;
 
   /// Set only if [hasToggleButton] is true, else it will throw
   final ToggleButtonStyle? toggleButtonStyle;
+
+  /// Menu state animation duration
   final Duration duration;
+
+  /// The open/collapse animation curve
+  final Curve animationCurve;
+
+  /// Menu look
   final SideMenuStyle? menuStyle;
 
-  /// the default selected index if [items] != null and [items.length] > [defaultIndex]
+  /// The default selected index if [items] is not empty and [items.length] > [defaultIndex]
   final int? defaultIndex;
 
   @override
   State<CollapsibleSideMenu> createState() => _CollapsibleSideMenuState();
 }
 
-class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenuWidthMixin {
+class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenuStateMixin {
   late MenuTileStyle _defaultStyle;
   late SideMenuStyle _menuStyle;
   late Color _backgroundColor, _unselectedColor;
-  double _currentWidth = MenuConstants.zeroWidth;
-  bool _userHasOverridden = false, _derivedValuesInitialized = false;
-  final Set<String> openNodes = {};
+  late List<SideMenuItem> _items;
+  late double _lastWidth;
+  late Decoration _decoration;
+  late bool _isMenuOpen;
   late final ValueNotifier<_SelectionState> _selection;
-  //
-  bool get _isMenuCollapsed => _currentWidth < widget.maxWidth;
+  final ValueNotifier<Set<String>> _openNodes = ValueNotifier({});
+  static const _debounceDuration = Duration(milliseconds: 110);
+  Timer? _resizeDebounce;
+  bool _isWidthInitialized = false, _derivedValuesInitialized = false;
 
-  bool get _isMenuOpen => _currentWidth == widget.maxWidth;
   //
   void onSelect(int rootIndex, List<int> path) {
     _selection.value = _SelectionState(index: rootIndex, path: path);
+    widget.onIndexChanged?.call(rootIndex);
   }
 
   void _toggleNode(List<int> path) {
     final key = path.join('-');
+    final updated = Set<String>.from(_openNodes.value);
 
-    setState(() => openNodes.contains(key) ? openNodes.remove(key) : openNodes.add(key));
+    updated.contains(key) ? updated.remove(key) : updated.add(key);
+    _openNodes.value = updated; // no setState, only SideMenuTile listeners rebuild
   }
 
   void _openMenu() {
-    _userHasOverridden = true;
-    setState(() => _currentWidth = widget.maxWidth);
+    if (!_isMenuOpen) setState(() => _isMenuOpen = true);
   }
 
   void _closeMenu() {
-    _userHasOverridden = true;
-    setState(() => _currentWidth = widget.minWidth);
+    if (_isMenuOpen) setState(() => _isMenuOpen = false);
   }
 
   void _toggleMenu() {
-    _userHasOverridden = true;
-    setState(() => _currentWidth = _isMenuCollapsed ? widget.maxWidth : widget.minWidth);
+    setState(() => _isMenuOpen = !_isMenuOpen);
   }
 
-  void _calculateMenuWidthSize() {
-    if (_userHasOverridden) return;
+  void _getMenuState(double width) {
+    _isMenuOpen = openMenuState(behaviour: widget.defaultBehaviour, from: widget.autoFrom, deviceWidth: width);
+  }
 
-    final width = calculateWidthSize(
-      minWidth: widget.minWidth,
-      maxWidth: widget.maxWidth,
-      currentWidth: _currentWidth,
-      behaviour: widget.defaultBehaviour,
-      deviceWidth: MediaQuery.widthOf(context),
-    );
+  void _setMenuState(double width) {
+    _lastWidth = width;
+    _getMenuState(_lastWidth);
+  }
 
-    if (width != _currentWidth) setState(() => _currentWidth = width);
+  void _setDecoration() {
+    _decoration = BoxDecoration(color: _backgroundColor, boxShadow: [?_menuStyle.boxShadow], borderRadius: _menuStyle.borderRadius);
   }
 
   void _attachController(SideMenuController controller) {
     controller.open = _openMenu;
     controller.close = _closeMenu;
     controller.toggle = _toggleMenu;
+    controller.isCollapsed = () => !_isMenuOpen;
   }
 
   void _recomputeDerivedValues() {
@@ -158,21 +226,25 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       decoration: const BoxDecoration(borderRadius: MenuConstants.borderRadius),
       selectedDecoration: BoxDecoration(color: colorScheme.inversePrimary, borderRadius: MenuConstants.borderRadius),
     );
+    _setDecoration();
   }
 
   //
   Widget _content(bool isOpen) {
-    final size = MediaQuery.sizeOf(context);
-
-    final content = SafeArea(
-      child: AnimatedContainer(
-        duration: widget.duration,
-        width: _currentWidth,
-        margin: _menuStyle.margin,
-        padding: _menuStyle.padding,
-        decoration: BoxDecoration(color: _backgroundColor, boxShadow: [?_menuStyle.boxShadow], borderRadius: _menuStyle.borderRadius),
-        constraints: BoxConstraints(minHeight: size.height, maxHeight: size.height, minWidth: widget.minWidth, maxWidth: widget.maxWidth),
-        child: _body(isOpen),
+    final content = Padding(
+      padding: _menuStyle.margin,
+      child: DecoratedBox(
+        decoration: _decoration,
+        child: Padding(
+          padding: _menuStyle.padding,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(end: isOpen ? widget.maxWidth : widget.minWidth),
+            duration: widget.duration,
+            curve: widget.animationCurve,
+            child: _body(isOpen),
+            builder: (_, width, child) => SizedBox(width: width, child: child),
+          ),
+        ),
       ),
     );
 
@@ -183,7 +255,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     return content;
   }
 
-  Widget _buildMenuItem({required SideMenuItemData tile, required int currentIndex, int? selectedIndex, required bool isOpen}) {
+  Widget _buildMenuItem({required SideMenuItem tile, required int currentIndex, int? selectedIndex, required List<int> path, required bool isOpen}) {
     final isSelected = currentIndex == selectedIndex;
 
     switch (tile) {
@@ -207,10 +279,10 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
             sideMenuBackgroundColor: _backgroundColor,
             // path handling
             basePath: [currentIndex],
-            selectedPath: isSelected ? _selection.value.path : [],
+            selectedPath: isSelected ? path : [],
             onSelectPath: (path) => onSelect(currentIndex, path),
             onToggle: _toggleNode,
-            openNodes: openNodes,
+            openNodes: _openNodes,
           ),
         );
 
@@ -221,7 +293,6 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
 
   Widget _body(bool isOpen) {
     final CustomMenuChild? customChild = widget.customMenuChild;
-
     final Color color = _unselectedColor;
     final List<Widget> customMenuChild = [
       if (customChild != null)
@@ -236,43 +307,43 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       mainAxisSize: .max,
       children: [
         // header
-        ColoredContent(key: const Key('header'), color: color, child: widget.header?.call(context, isOpen)),
+        if (widget.header != null)
+          RepaintBoundary(
+            child: ColoredContent(key: const Key('header'), color: color, child: widget.header?.call(context, isOpen)),
+          ),
+
         // custom child above items
         if (customChild?.childPosition == .aboveItems) ...customMenuChild,
-        // items
-        ValueListenableBuilder<_SelectionState>(
-          valueListenable: _selection,
-          builder: (_, selection, _) {
-            final List<SideMenuItemData> items = _builder(isOpen, selection.index);
-            assert(
-              widget.defaultIndex == null || (widget.defaultIndex! < items.length),
-              'defaultIndex (${widget.defaultIndex}) is out of range for items.length (${items.length})',
-            );
 
-            if (items.isEmpty) return const SizedBox.shrink();
-            return Expanded(
-              child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (_, i) => _buildMenuItem(tile: items[i], currentIndex: i, selectedIndex: selection.index, isOpen: isOpen),
-                addAutomaticKeepAlives: false,
-                addSemanticIndexes: false,
-              ),
-            );
-          },
-        ),
-        ?widget.spacerAfterItems,
+        // items
+        if (_items.isNotEmpty) ...[
+          Expanded(
+            child: ValueListenableBuilder<_SelectionState>(
+              valueListenable: _selection,
+              builder: (_, selection, _) {
+                return ListView.builder(
+                  itemCount: _items.length,
+                  itemBuilder: (_, i) {
+                    return _buildMenuItem(tile: _items[i], currentIndex: i, selectedIndex: selection.index, path: selection.path, isOpen: isOpen);
+                  },
+                  addAutomaticKeepAlives: false,
+                  addSemanticIndexes: false,
+                );
+              },
+            ),
+          ),
+          ?widget.spacerAfterItems,
+        ],
+
         // custom child below items
         if (customChild?.childPosition == .belowItems) ...customMenuChild,
-        // footer
-        ColoredContent(key: const Key('footer'), color: color, child: widget.footer?.call(context, isOpen)),
-      ],
-    );
-  }
 
-  List<SideMenuItemData> _builder(bool isOpen, int? selectedIndex) {
-    return widget.builder(
-      context,
-      SideMenuBuilder(isOpen: isOpen, textDirection: _menuStyle.textDirection ?? Directionality.of(context), selectedIndex: selectedIndex),
+        // footer
+        if (widget.header != null)
+          RepaintBoundary(
+            child: ColoredContent(key: const Key('footer'), color: color, child: widget.footer?.call(context, isOpen)),
+          ),
+      ],
     );
   }
 
@@ -303,37 +374,62 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     _menuStyle = widget.menuStyle ?? SideMenuStyle();
     _selection = ValueNotifier(_SelectionState(index: widget.defaultIndex));
     if (widget.controller != null) _attachController(widget.controller!);
+    _items = widget.items;
   }
 
   @override
   void didChangeDependencies() {
-    if (_currentWidth == MenuConstants.zeroWidth) _calculateMenuWidthSize();
     _recomputeDerivedValues();
+
+    final width = MediaQuery.widthOf(context);
+    if (!_isWidthInitialized) {
+      _isWidthInitialized = true;
+      _setMenuState(width);
+    }
+    //
+    if (_lastWidth != width) {
+      _isWidthInitialized = true;
+
+      _resizeDebounce?.cancel();
+      _resizeDebounce = Timer(_debounceDuration, () {
+        if (!mounted) return;
+        _setMenuState(width);
+        setState(() {});
+      });
+    }
 
     super.didChangeDependencies();
   }
 
   @override
   void didUpdateWidget(covariant CollapsibleSideMenu oldWidget) {
-    // calculate menu width
-    if (oldWidget.defaultBehaviour != widget.defaultBehaviour || oldWidget.minWidth != widget.minWidth || oldWidget.maxWidth != widget.maxWidth) {
-      _userHasOverridden = false;
-      _calculateMenuWidthSize();
+    final width = MediaQuery.widthOf(context);
+    if (_lastWidth != width || oldWidget.defaultBehaviour != widget.defaultBehaviour) {
+      _setMenuState(width);
     }
     // set menu style
-    if (oldWidget.menuStyle != widget.menuStyle) _menuStyle = widget.menuStyle ?? SideMenuStyle();
+    if (oldWidget.menuStyle != widget.menuStyle) {
+      _menuStyle = widget.menuStyle ?? SideMenuStyle();
+      if (oldWidget.menuStyle?.boxShadow != widget.menuStyle?.boxShadow) _setDecoration();
+    }
     // set controller
     if (oldWidget.controller != widget.controller && widget.controller != null) _attachController(widget.controller!);
     // set default values
     if (oldWidget.menuStyle != widget.menuStyle) _recomputeDerivedValues();
+    //
+    if (oldWidget.items != widget.items) _items = widget.items;
 
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      widget.defaultIndex == null || (widget.defaultIndex! < _items.length),
+      'defaultIndex (${widget.defaultIndex}) is out of range for items.length (${_items.length})',
+    );
     final bool isOpen = _isMenuOpen;
-    final child = RepaintBoundary(child: _content(isOpen));
+    final child = SafeArea(child: RepaintBoundary(child: _content(isOpen)));
 
     if (widget.hasToggleButton) return _hasToggleButton(child: child, isOpen: isOpen);
     return child;
@@ -342,6 +438,8 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   @override
   void dispose() {
     _selection.dispose();
+    _openNodes.dispose();
+    _resizeDebounce?.cancel();
 
     super.dispose();
   }
@@ -353,18 +451,19 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     properties
       ..add(FlagProperty('hasToggleButton', value: widget.hasToggleButton, ifTrue: 'toggle enabled', ifFalse: 'toggle disabled'))
       ..add(EnumProperty<MenuBehaviour>('defaultBehaviour', widget.defaultBehaviour))
+      ..add(EnumProperty<AutoOpenFrom>('autoFrom', widget.autoFrom))
       ..add(DoubleProperty('minWidth', widget.minWidth))
       ..add(DoubleProperty('maxWidth', widget.maxWidth))
-      ..add(DoubleProperty('currentWidth', _currentWidth))
+      ..add(DoubleProperty('currentWidth', _isMenuOpen ? widget.maxWidth : widget.minWidth))
       ..add(IntProperty('selectedIndex', _selection.value.index))
       ..add(IterableProperty<int>('selectedPath', _selection.value.path))
-      ..add(IntProperty('openNodesCount', openNodes.length))
+      ..add(IntProperty('openNodesCount', _openNodes.value.length))
       ..add(DiagnosticsProperty<Duration>('duration', widget.duration))
+      ..add(DiagnosticsProperty<Curve>('animationCurve', widget.animationCurve))
       ..add(ColorProperty('backgroundColor', _backgroundColor))
       ..add(DiagnosticsProperty<SideMenuStyle>('menuStyle', _menuStyle))
       ..add(ObjectFlagProperty<SideMenuController>.has('controller', widget.controller))
       ..add(IntProperty('defaultIndex', widget.defaultIndex))
-      ..add(FlagProperty('isCollapsed', value: _isMenuCollapsed, ifTrue: 'collapsed', ifFalse: 'expanded'))
-      ..add(FlagProperty('isOpen', value: _isMenuOpen, ifTrue: 'open', ifFalse: 'closed'));
+      ..add(FlagProperty('isOpen', value: _isMenuOpen, ifTrue: 'opened', ifFalse: 'collapsed'));
   }
 }

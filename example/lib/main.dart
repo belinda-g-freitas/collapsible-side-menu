@@ -1,18 +1,11 @@
 import 'package:collapsible_side_menu/collapsible_side_menu.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter/rendering.dart';
-
 final themeModeNotifier = ValueNotifier<ThemeMode>(.system);
-const Color appColor = Color(0xFF_292CFF); // Color(0xFF_0D9488); // Color(0xFF_F2A900);
+const Color appColor = Color(0xFF_292CFF);
 const RoundedRectangleBorder roundedBorder = .new(borderRadius: .all(.circular(10)));
 
 void main() {
-  // debugPrintRebuildDirtyWidgets = true;
-  // debugProfileBuildsEnabled = true;
-  // debugPrintLayouts = true;
-  // debugRepaintRainbowEnabled = true;
-  // debugPaintSizeEnabled = true;
 
   runApp(const MainApp());
 }
@@ -66,6 +59,7 @@ class ExampleScreen extends StatefulWidget {
 }
 
 class _ExampleScreenState extends State<ExampleScreen> {
+  static const TextDirection menutextDirection = TextDirection.ltr;
   final _controller = SideMenuController();
 
   @override
@@ -78,6 +72,7 @@ class _ExampleScreenState extends State<ExampleScreen> {
           CollapsibleSideMenu(
             defaultIndex: 3,
             defaultBehaviour: .open,
+            menuStyle: SideMenuStyle(textDirection: menutextDirection),
             toggleButtonStyle: const ToggleButtonStyle(topPosition: 55, iconSize: 16),
             header: (_, isOpen) {
               return Column(
@@ -123,70 +118,70 @@ class _ExampleScreenState extends State<ExampleScreen> {
                 ],
               );
             },
-            builder: (_, menuData) {
-              return [
-                TileData(
-                  title: 'User management',
-                  leading: const Icon(Icons.person_outline, size: 18),
-                  selectedLeading: const Icon(Icons.person, size: 18),
-                  subTiles: [
-                    SubTileData(title: 'Customers'),
-                    SubTileData(
-                      title: 'Employees',
-                      subTiles: [
-                        SubTileData(title: 'Drivers'),
-                        SubTileData(title: 'HR'),
-                        SubTileData(title: 'Accountants'),
-                        SubTileData(title: 'Marketing'),
-                      ],
-                    ),
-                    SubTileData(
-                      title: 'Admins',
-                      subTiles: [
-                        SubTileData(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sudo')));
-                          },
-                          title: 'Sudo',
-                          leading: const Icon(Icons.shield, size: 18),
-                        ),
-                        SubTileData(title: 'Super-admins'),
-                        SubTileData(title: 'Admins'),
-                      ],
-                    ),
-                    SubTileData(title: 'Salaries', trailing: const Icon(Icons.attach_money, size: 18)),
-                  ],
-                ),
-                //
-                const DividerData(),
-                const TitleData(title: 'OTHERS'),
-                TileData(onTap: () {}, title: 'Vehicle', leading: const Icon(Icons.car_rental, size: 18)),
-                TileData(
-                  onTap: () {},
-                  title: 'Conversations',
-                  leading: const Icon(Icons.chat_bubble_outline, size: 18),
-                  selectedLeading: const Icon(Icons.chat_bubble, size: 18),
-                  badgeBuilder: (tile) =>
-                      Badge.count(count: 100, maxCount: 9, offset: Offset(menuData.textDirection == .rtl ? 2 : -2, -4), child: tile),
-                ),
-                TileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
-                TileData(
-                  onTap: () {
-                    showAdaptiveAboutDialog(context: context);
-                  },
-                  title: 'About',
-                  leading: const Icon(Icons.info_outline, size: 18),
-                  selectedLeading: const Icon(Icons.info, size: 18),
-                ),
-                TileData(
-                  onTap: () {
-                    showLicensePage(context: context);
-                  },
-                  title: 'Licenses',
-                  leading: const Icon(Icons.copyright_outlined, size: 18),
-                  selectedLeading: const Icon(Icons.copyright, size: 18),
-                ),
-              ];
+            items: [
+              TileData(
+                title: 'User management',
+                leading: const Icon(Icons.person_outline, size: 18),
+                selectedLeading: const Icon(Icons.person, size: 18),
+                subTiles: [
+                  SubTileData(title: 'Customers'),
+                  SubTileData(
+                    title: 'Employees',
+                    subTiles: [
+                      SubTileData(title: 'Drivers'),
+                      SubTileData(title: 'HR'),
+                      SubTileData(title: 'Accountants'),
+                      SubTileData(title: 'Marketing'),
+                    ],
+                  ),
+                  SubTileData(
+                    title: 'Admins',
+                    subTiles: [
+                      SubTileData(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sudo')));
+                        },
+                        title: 'Sudo',
+                        leading: const Icon(Icons.shield, size: 18),
+                      ),
+                      SubTileData(title: 'Super-admins'),
+                      SubTileData(title: 'Admins'),
+                    ],
+                  ),
+                  SubTileData(title: 'Salaries', trailing: const Icon(Icons.attach_money, size: 18)),
+                ],
+              ),
+              //
+              const DividerData(),
+              const TitleData(title: 'OTHERS'),
+              TileData(onTap: () {}, title: 'Vehicle', leading: const Icon(Icons.car_rental, size: 18)),
+              TileData(
+                onTap: () {},
+                title: 'Conversations',
+                leading: const Icon(Icons.chat_bubble_outline, size: 18),
+                selectedLeading: const Icon(Icons.chat_bubble, size: 18),
+                badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: Offset(menutextDirection == .rtl ? 2 : -2, -4), child: tile),
+              ),
+              TileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
+              TileData(
+                onTap: () {
+                  showAdaptiveAboutDialog(context: context);
+                },
+                title: 'About',
+                leading: const Icon(Icons.info_outline, size: 18),
+                selectedLeading: const Icon(Icons.info, size: 18),
+              ),
+              TileData(
+                onTap: () {
+                  showLicensePage(context: context);
+                },
+                title: 'Licenses',
+                leading: const Icon(Icons.copyright_outlined, size: 18),
+                selectedLeading: const Icon(Icons.copyright, size: 18),
+              ),
+            ],
+            onIndexChanged: (index) {
+              debugPrint('current index: $index');
             },
           ),
           // app content
@@ -203,44 +198,42 @@ class _ExampleScreenState extends State<ExampleScreen> {
                       selected: {themeModeNotifier.value},
                       onSelectionChanged: (value) => setState(() => themeModeNotifier.value = value.first),
                     ),
-                    const Expanded(child: /* ColorSchemePreview() */ const SizedBox()),
+                    const Expanded(child: ColorSchemePreview()),
                   ],
                 ),
               ),
             ),
           ),
           // end menu
-          // SideMenu(
-          //   controller: _controller,
-          //   hasToggleButton: false,
-          //   defaultIndex: 1,
-          //   duration: const Duration(milliseconds: 500),
-          //   menuStyle: SideMenuStyle(textDirection: .rtl, backgroundColor: ColorScheme.of(context).onPrimaryFixed),
-          //   builder: (_, _) {
-          //     return SideMenuData(
-          //       customChild: const FlutterLogo(style: .stacked, size: 40),
-          //       customChildFlex: 0,
-          //       customChildPosition: .belowItems,
-          //       items: [
-          //         SideMenuTileData(
-          //           onTap: () {
-          //             _controller.toggle();
-          //           },
-          //           title: 'Toggle menu',
-          //         ),
-          //         SideMenuTileData(title: 'Example 2'),
-          //         SideMenuTileData(
-          //           onTap: () {
-          //             showLicensePage(context: context);
-          //           },
-          //           title: 'Licenses',
-          //           leading: const Icon(Icons.copyright_outlined, size: 18),
-          //           selectedLeading: const Icon(Icons.copyright, size: 18),
-          //         ),
-          //       ],
-          //     );
-          //   },
-          // ),
+          CollapsibleSideMenu(
+            controller: _controller,
+            hasToggleButton: false,
+            defaultIndex: 1,
+            duration: const Duration(milliseconds: 350),
+            menuStyle: SideMenuStyle(textDirection: .rtl, backgroundColor: ColorScheme.of(context).onPrimaryFixed),
+            customMenuChild: CustomMenuChild(
+              child: const FlutterLogo(style: .stacked, size: 40),
+              childFlex: 0,
+              childPosition: .belowItems,
+            ),
+            items: [
+              TileData(
+                onTap: () {
+                  _controller.toggle();
+                },
+                title: 'Toggle menu',
+              ),
+              TileData(title: 'Example 2'),
+              TileData(
+                onTap: () {
+                  showLicensePage(context: context);
+                },
+                title: 'Licenses',
+                leading: const Icon(Icons.copyright_outlined, size: 18),
+                selectedLeading: const Icon(Icons.copyright, size: 18),
+              ),
+            ],
+          ),
         ],
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Returns `const SizedBox.shrink()` if [child] is null
 class ColoredContent extends StatelessWidget {
+  /// Returns `const SizedBox.shrink()` if [child] is null
   const ColoredContent({super.key, required this.color, this.child});
 
   final Color color;

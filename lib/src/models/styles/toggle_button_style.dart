@@ -25,11 +25,6 @@ class ToggleButtonStyle {
   }
 
   @override
-  String toString() {
-    return 'ToggleButtonStyle(iconColor: $iconColor, topPosition: $topPosition, opacity: $opacity, iconSize: $iconSize, icon: $icon, backgroundColor: $backgroundColor)';
-  }
-
-  @override
   bool operator ==(covariant ToggleButtonStyle other) {
     if (identical(this, other)) return true;
 

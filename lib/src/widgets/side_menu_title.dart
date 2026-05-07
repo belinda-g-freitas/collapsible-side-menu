@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/data/side_menu_item_data.dart';
+import '../models/data/side_menu_item.dart';
 
 class SideMenuTitle extends StatelessWidget {
   const SideMenuTitle({super.key, required this.data, required this.color});

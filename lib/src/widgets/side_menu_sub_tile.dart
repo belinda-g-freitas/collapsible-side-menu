@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../models/data/side_menu_item_data.dart';
+import '../models/data/side_menu_item.dart';
 import '../models/styles/sub_menu_tile_style.dart';
+import '../utils/menu_constants.dart';
 import '../utils/utils.dart';
 import 'colored_content.dart';
+import 'open_indicator_icon.dart';
 import 'sub_tile_widget.dart';
 
 class SideMenuSubTile extends StatefulWidget {
@@ -27,7 +29,7 @@ class SideMenuSubTile extends StatefulWidget {
   final List<int> basePath;
   final void Function(List<int> path) onSelectPath;
   final void Function(List<int> path) onToggle;
-  final Set<String> openNodes;
+  final ValueNotifier<Set<String>> openNodes;
 
   @override
   State<SideMenuSubTile> createState() => _SideMenuSubTileState();
@@ -38,11 +40,13 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
   late List<int> _nodeKey;
   late SubTileData tile;
   late List<SubTileData> subTiles;
+  late String _nodeKeyString;
+  late bool _hasSubtiles;
 
-  bool get _isOpen => widget.openNodes.contains(_nodeKey.join('-'));
+  bool _isOpen(Set<String> nodes) => nodes.contains(_nodeKeyString);
   //
-  Widget _createView() {
-    Widget view = _tile();
+  Widget _createView(bool isOpen) {
+    Widget view = _tile(isOpen);
 
     // has badge
     final badge = tile.badgeBuilder?.call(view);
@@ -52,23 +56,23 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
   }
 
   // leading, title and trailing of the tile
-  Widget _tile() {
-    final Color color = _getChildColor(_isOpen);
-    final Widget? leading = _leading(color);
+  Widget _tile(bool isOpen) {
+    final Color color = _getChildColor(isOpen);
+    final Widget? leading = _leading(color, isOpen);
 
     return Row(
       spacing: _style.horizontalSpacing,
       children: [
         ?leading,
-        _title(color, hasLeading: leading != null),
-        ...?_trailing(color),
+        _title(color, isOpen, hasLeading: leading != null),
+        ...?_trailing(color, isOpen),
       ],
     );
   }
 
   //
-  Widget? _leading(Color color) {
-    final Widget? selectedLeading = _isOpen && tile.selectedLeading != null ? tile.selectedLeading : tile.leading;
+  Widget? _leading(Color color, bool isOpen) {
+    final Widget? selectedLeading = isOpen && tile.selectedLeading != null ? tile.selectedLeading : tile.leading;
 
     return selectedLeading == null
         ? null
@@ -80,8 +84,8 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
           );
   }
 
-  Widget _title(Color color, {required bool hasLeading}) {
-    final TextStyle? textStyle = (_isOpen ? _style.selectedTitleStyle : _style.titleStyle) ?? TextTheme.of(context).bodySmall;
+  Widget _title(Color color, bool isOpen, {required bool hasLeading}) {
+    final TextStyle? textStyle = (isOpen ? _style.selectedTitleStyle : _style.titleStyle) ?? TextTheme.of(context).bodySmall;
 
     return Expanded(
       flex: 5,
@@ -89,7 +93,7 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
         padding: hasLeading ? .zero : const .fromSTEB(10, 0, 0, 0),
         child: Text(
           tile.title,
-          style: textStyle?.copyWith(color: textStyle.color ?? (_isOpen ? _style.selectedColor : _style.color)),
+          style: textStyle?.copyWith(color: textStyle.color ?? (isOpen ? _style.selectedColor : _style.color)),
           maxLines: 1,
           overflow: textStyle?.overflow ?? .ellipsis,
         ),
@@ -97,11 +101,10 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     );
   }
 
-  List<Widget>? _trailing(Color color) {
-    Widget openIcon = Padding(
-      padding: const .fromSTEB(0, 0, 5, 0),
-      child: Icon(_isOpen ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 14, color: color),
-    );
+  Widget _openIcon(Color color) => OpenIndicatorIcon(nodeKey: _nodeKeyString, openNodes: widget.openNodes, color: color);
+
+  List<Widget>? _trailing(Color color, bool isOpen) {
+    Widget openIcon = _openIcon(color);
 
     if (tile.trailing != null) {
       final Widget trailing = Expanded(
@@ -114,11 +117,11 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
       return [
         trailing,
         // icon indicating tile has sub-tiles
-        if (subTiles.isNotEmpty) openIcon,
+        if (_hasSubtiles) openIcon,
       ];
     }
 
-    if (subTiles.isNotEmpty) return [openIcon];
+    if (_hasSubtiles) return [openIcon];
 
     return null;
   }
@@ -172,8 +175,10 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     super.initState();
 
     _nodeKey = widget.basePath;
+    _nodeKeyString = _nodeKey.join('-');
     tile = widget.tile;
     subTiles = tile.subTiles;
+    _hasSubtiles = subTiles.isNotEmpty;
     _style = tile.style ?? SubMenuTileStyle();
   }
 
@@ -181,9 +186,20 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
   void didUpdateWidget(covariant SideMenuSubTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (!listEquals(oldWidget.basePath, widget.basePath)) _nodeKey = widget.basePath;
-    if (oldWidget.tile != widget.tile) tile = widget.tile;
-    if (!listEquals(oldWidget.tile.subTiles, widget.tile.subTiles)) subTiles = tile.subTiles;
+    if (!listEquals(oldWidget.basePath, widget.basePath)) {
+      _nodeKey = widget.basePath;
+      _nodeKeyString = _nodeKey.join('-');
+    }
+    //
+    if (oldWidget.tile != widget.tile) {
+      tile = widget.tile;
+      subTiles = tile.subTiles;
+      _hasSubtiles = subTiles.isNotEmpty;
+    } else if (!listEquals(oldWidget.tile.subTiles, widget.tile.subTiles)) {
+      subTiles = tile.subTiles;
+      _hasSubtiles = subTiles.isNotEmpty;
+    }
+    //
     if (oldWidget.tile.style != widget.tile.style) _style = tile.style ?? SubMenuTileStyle();
   }
 
@@ -194,50 +210,54 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     return Padding(
       padding: _style.margin,
       child: Material(
-        color: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: .start,
-          mainAxisSize: .min,
-          children: [
-            // tile
-            InkWell(
-              onTap: () {
-                widget.onToggle(_nodeKey);
-                tile.onTap?.call();
-              },
+        color: MenuConstants.transparent,
+        child: ValueListenableBuilder<Set<String>>(
+          valueListenable: widget.openNodes,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
               borderRadius: _style.borderRadius,
-              // no hover effect when expanded
-              hoverColor: _isOpen ? Colors.transparent : _style.hoverColor,
-              child: Container(
-                height: _style.tileHeight,
-                padding: _style.padding,
-                decoration:
-                    (_isOpen ? _style.selectedDecoration : _style.decoration) ??
-                    ShapeDecoration(
-                      shape: RoundedRectangleBorder(borderRadius: _style.borderRadius),
-                      color: _isOpen ? _style.selectedBackgroundColor : _style.backgroundColor,
-                    ),
-                child: _createView(),
+              border: Border(
+                left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
+                right: isRTL ? BorderSide(color: _style.color!, width: _style.openMenuLineWidth) : BorderSide.none,
+                bottom: BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
               ),
             ),
-            // sub tiles
-            // We set maintainState to true to keep sub-menus states (selected sub-tile and opened sub-menu)
-            Visibility(
-              visible: _isOpen,
-              maintainState: true,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
+            child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
+          ),
+          builder: (_, nodes, child) {
+            final isOpen = _isOpen(nodes);
+
+            return Column(
+              crossAxisAlignment: .start,
+              mainAxisSize: .min,
+              children: [
+                // tile
+                InkWell(
+                  onTap: () {
+                    widget.onToggle(_nodeKey);
+                    tile.onTap?.call();
+                  },
                   borderRadius: _style.borderRadius,
-                  border: Border(
-                    left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
-                    right: isRTL ? BorderSide(color: _style.color!, width: _style.openMenuLineWidth) : BorderSide.none,
-                    bottom: BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
+                  // no hover effect when expanded
+                  hoverColor: isOpen ? Colors.transparent : _style.hoverColor,
+                  child: Container(
+                    height: _style.tileHeight,
+                    padding: _style.padding,
+                    decoration:
+                        (isOpen ? _style.selectedDecoration : _style.decoration) ??
+                        ShapeDecoration(
+                          shape: RoundedRectangleBorder(borderRadius: _style.borderRadius),
+                          color: isOpen ? _style.selectedBackgroundColor : _style.backgroundColor,
+                        ),
+                    child: _createView(isOpen),
                   ),
                 ),
-                child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
-              ),
-            ),
-          ],
+                // sub tiles
+                // We set maintainState to true to keep sub-menus states (selected sub-tile and opened sub-menu)
+                Visibility(visible: isOpen, maintainState: true, child: child!),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -252,11 +272,11 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     properties.add(DiagnosticsProperty<List<int>>('basePath', _nodeKey));
     properties.add(DiagnosticsProperty<List<int>>('selectedPath', widget.selectedPath));
     // state
-    properties.add(FlagProperty('_isOpen', value: _isOpen, ifTrue: 'expanded', ifFalse: 'collapsed'));
+    properties.add(FlagProperty('_isOpen', value: _isOpen(widget.openNodes.value), ifTrue: 'expanded', ifFalse: 'collapsed'));
     properties.add(FlagProperty('isMenuOpen', value: widget.isMenuOpen, ifTrue: 'menu-open'));
     // structure
     properties.add(IntProperty('subTileCount', subTiles.length));
-    properties.add(IterableProperty<String>('openNodes', widget.openNodes));
+    properties.add(IterableProperty<String>('openNodes', widget.openNodes.value));
     // style
     properties.add(DiagnosticsProperty<BorderRadius?>('borderRadius', _style.borderRadius, defaultValue: null));
     properties.add(DoubleProperty('tileHeight', _style.tileHeight));

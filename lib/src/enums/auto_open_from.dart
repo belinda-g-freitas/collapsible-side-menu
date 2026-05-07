@@ -1,0 +1,1 @@
+enum AutoOpenFrom { tablet, desktop }

@@ -26,9 +26,4 @@ class SideMenuStyle {
     this.defaultTileStyle,
   }) : assert(padding.isNonNegative),
        assert(margin.isNonNegative);
-
-  @override
-  String toString() {
-    return 'SideMenuStyle(backgroundColor: $backgroundColor, boxShadow: $boxShadow, textDirection: $textDirection, borderRadius: $borderRadius, padding: $padding, margin: $margin, defaultTileStyle: $defaultTileStyle)';
-  }
 }

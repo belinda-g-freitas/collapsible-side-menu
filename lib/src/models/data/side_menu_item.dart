@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
 import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, Size, TextAlign, TextStyle, VoidCallback, Widget;
 
@@ -17,11 +18,11 @@ mixin _BaseSideMenuData {
 }
 
 //
-sealed class SideMenuItemData {
-  const SideMenuItemData();
+sealed class SideMenuItem {
+  const SideMenuItem();
 }
 
-class TitleData extends SideMenuItemData {
+class TitleData extends SideMenuItem {
   const TitleData({required this.title, this.titleStyle, this.textAlign, this.padding});
 
   final String title;
@@ -29,27 +30,24 @@ class TitleData extends SideMenuItemData {
   final TextAlign? textAlign;
   final EdgeInsetsGeometry? padding;
 
-  @override
-  String toString() {
-    return 'SideMenuTitleData(title: $title, titleStyle: $titleStyle, textAlign: $textAlign, padding: $padding)';
+  TitleData copyWith({String? title, TextStyle? titleStyle, TextAlign? textAlign, EdgeInsetsGeometry? padding}) {
+    return TitleData(
+      title: title ?? this.title,
+      titleStyle: titleStyle ?? this.titleStyle,
+      textAlign: textAlign ?? this.textAlign,
+      padding: padding ?? this.padding,
+    );
   }
 }
 
-class DividerData extends SideMenuItemData {
+class DividerData extends SideMenuItem {
   const DividerData({this.divider = const Divider(), this.padding}) : super();
 
   final Widget divider;
   final EdgeInsetsGeometry? padding;
-
-  DividerData copyWith({Widget? divider, EdgeInsetsGeometry? padding}) {
-    return DividerData(divider: divider ?? this.divider, padding: padding ?? this.padding);
-  }
-
-  @override
-  String toString() => 'SideMenuDividerData(divider: $divider, padding: $padding)';
 }
 
-class TileData extends SideMenuItemData with _BaseSideMenuData {
+class TileData extends SideMenuItem with _BaseSideMenuData {
   final Size selectedIndicatorSize;
   final bool hasSelectedIndicator;
   final MenuTileStyle? style;
@@ -132,11 +130,6 @@ class TileData extends SideMenuItemData with _BaseSideMenuData {
   }
 
   @override
-  String toString() {
-    return 'SideMenuTileData(title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap, selectedIndicatorSize: $selectedIndicatorSize, hasSelectedIndicator: $hasSelectedIndicator, style: $style, subTiles: $subTiles, id: $id)';
-  }
-
-  @override
   bool operator ==(covariant TileData other) {
     if (identical(this, other)) return true;
 
@@ -171,8 +164,8 @@ class TileData extends SideMenuItemData with _BaseSideMenuData {
 
 /// Can only be called from [TileData.subTiles]
 ///
-/// Will be ignored if called directly inside [SideMenuData.items]
-class SubTileData extends SideMenuItemData with _BaseSideMenuData {
+/// Will be ignored if called directly inside [CollapsibleSideMenu.items]
+class SubTileData extends SideMenuItem with _BaseSideMenuData {
   final List<SubTileData> subTiles;
   final SubMenuTileStyle? style;
   final String? id;
@@ -243,11 +236,6 @@ class SubTileData extends SideMenuItemData with _BaseSideMenuData {
       badgeBuilder: badgeBuilder ?? this.badgeBuilder,
       onTap: onTap ?? this.onTap,
     );
-  }
-
-  @override
-  String toString() {
-    return 'SideMenuSubTileData(subTiles: $subTiles, style: $style, id: $id, title: $title, leading: $leading, selectedLeading: $selectedLeading, trailing: $trailing, badgeBuilder: $badgeBuilder, onTap: $onTap)';
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../models/data/side_menu_item_data.dart';
+import '../models/data/side_menu_item.dart';
 import '../models/styles/base_tile_style.dart';
 import '../models/styles/sub_menu_tile_style.dart';
 import '../utils/menu_constants.dart';
@@ -46,7 +46,7 @@ class SubTileWidget extends StatelessWidget {
     final borderRadius = subStyle?.borderRadius ?? MenuConstants.borderRadius;
 
     return Material(
-      color: Colors.transparent,
+      color: MenuConstants.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: borderRadius,

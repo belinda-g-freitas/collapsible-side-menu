@@ -1,1 +1,1 @@
-enum MenuBehaviour { auto, open, compact }
+enum MenuBehaviour { auto, open, collapse }

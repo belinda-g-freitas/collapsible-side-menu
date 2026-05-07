@@ -6,9 +6,24 @@
 
 `collapsible_side_menu` is a highly customizable Flutter package for building a collapsible side menu, with text direction (LTR & RTL) and sub-menu features.
 
-| Mobile |                                                                                 Desktop                                                                                 |                                                                                                                        Web                                                                                                                        |
-| :----: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <video controls><source src="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_android.mp4" type="video/mp4"></video>  | <video controls><source src="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_desktop.mp4" type="video/mp4"></video> | <a href="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_web.png"><img src="https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_web.png"></a> |
+|                       Mobile                        |                       Desktop                        |                     Web                      |
+| :-------------------------------------------------: | :--------------------------------------------------: | :------------------------------------------: |
+| ![Mobile](assets/collapsible_side_menu_android.gif) | ![Desktop](assets/collapsible_side_menu_desktop.gif) | ![Web](assets/collapsible_side_menu_web.png) |
+
+Full [mobile](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_android.mp4) and [desktop](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_desktop.mp4) demo videos.
+
+## Table of contents
+
+- [collapsible\_side\_menu](#collapsible_side_menu)
+  - [Table of contents](#table-of-contents)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [Installation](#installation)
+    - [Import package](#import-package)
+    - [Basic usage example](#basic-usage-example)
+    - [Elements, types, usage and description](#elements-types-usage-and-description)
+    - [Class, parameters, types and defaults](#class-parameters-types-and-defaults)
+  - [⚠️Warning](#️warning)
 
 ## Features
 
@@ -19,7 +34,7 @@
 - add tiles and and their sub-tiles
 - customize menu, tile and sub-tile look
 
-## Quick start
+## Usage
 
 ### Installation
 
@@ -27,7 +42,10 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  collapsible_side_menu: ^1.0.0+1
+  flutter:
+    sdk: flutter
+  # add this line
+  collapsible_side_menu: ^latest_version
 ```
 
 or run
@@ -36,159 +54,198 @@ or run
 flutter pub add collapsible_side_menu
 ```
 
-### Basic usage
+### Import package
+
+Add the following line to your code
 
 ```dart
-SideMenu(
+import 'package:collapsible_side_menu/collapsible_side_menu.dart';
+```
+
+### Basic usage example
+
+```dart
+static const TextDirection menutextDirection = TextDirection.rtl;
+
+CollapsibleSideMenu(
   defaultIndex: 3,
   defaultBehaviour: .open,
+  menuStyle: SideMenuStyle(textDirection: menutextDirection),
   toggleButtonStyle: const ToggleButtonStyle(topPosition: 55, iconSize: 16),
-  builder: (menuData, activeIndex) {
-    return SideMenuData(
-      header: Column(
-        crossAxisAlignment: .start,
-        children: [
-          Row(
-            spacing: 10,
-            mainAxisSize: .min,
-            children: [
-              Flexible(child: CircleAvatar(radius: 22, child: FlutterLogo())),
-              if (menuData.isOpen)
-                Flexible(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: .start,
-                    children: [
-                      Text(
-                        'Joanna Doe',
-                        overflow: .ellipsis,
-                        style: const TextStyle(fontWeight: .w500, fontSize: 14.5),
-                      ),
-                      Text(
-                        'joanna.doe.404@flutter.dev',
-                        overflow: .ellipsis,
-                        style: const TextStyle(fontSize: 12, fontWeight: .w300),
-                      ),
-                    ],
-                  ),
+  header: (_, isOpen) {
+    return Column(
+      crossAxisAlignment: .start,
+      children: [
+        Row(
+          spacing: 10,
+          mainAxisSize: .min,
+          children: [
+            const Flexible(child: CircleAvatar(radius: 22, child: FlutterLogo())),
+            if (isOpen)
+              const Flexible(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: .start,
+                  children: [
+                    Text(
+                      'Joanna Doe',
+                      overflow: .ellipsis,
+                      style: TextStyle(fontWeight: .w500, fontSize: 14.5),
+                    ),
+                    Text(
+                      'joanna.doe.404@flutter.dev',
+                      overflow: .ellipsis,
+                      style: TextStyle(fontSize: 12, fontWeight: .w300),
+                    ),
+                  ],
                 ),
-            ],
-          ),
-          const Divider(thickness: .5),
-        ],
-      ),
-      footer: Column(
-        mainAxisAlignment: .end,
-        crossAxisAlignment: .start,
-        children: [
-          const Divider(thickness: .5),
-          Text('v1.0.1+1', style: TextStyle(fontSize: menuData.isOpen ? 12 : 10)),
-        ],
-      ),
-      items: [
-        SideMenuTileData(
-          title: 'User management',
-          leading: const Icon(Icons.person_outline, size: 18),
-          selectedLeading: const Icon(Icons.person, size: 18),
-          subTiles: [
-            SideMenuSubTileData(title: 'Customers'),
-            SideMenuSubTileData(
-              title: 'Employees',
-              subTiles: [
-                SideMenuSubTileData(title: 'Drivers'),
-                SideMenuSubTileData(title: 'HR'),
-                SideMenuSubTileData(title: 'Accountants'),
-                SideMenuSubTileData(title: 'Marketing'),
-              ],
-            ),
-            SideMenuSubTileData(
-              title: 'Admins',
-              subTiles: [
-                SideMenuSubTileData(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sudo')));
-                  },
-                  title: 'Sudo',
-                  leading: Icon(Icons.shield, size: 18),
-                ),
-                SideMenuSubTileData(title: 'Super-admins'),
-                SideMenuSubTileData(title: 'Admins'),
-              ],
-            ),
-            SideMenuSubTileData(title: 'Salaries', trailing: Icon(Icons.attach_money, size: 18)),
+              ),
           ],
         ),
-        //
-        SideMenuDividerData(),
-        SideMenuTitleData(title: 'OTHERS'),
-        SideMenuTileData(onTap: () {}, title: 'Vehicle', leading: const Icon(Icons.car_rental, size: 18)),
-        SideMenuTileData(
-          onTap: () {},
-          title: 'Conversations',
-          leading: const Icon(Icons.chat_bubble_outline, size: 18),
-          selectedLeading: const Icon(Icons.chat_bubble, size: 18),
-          badgeBuilder: (tile) =>
-              Badge.count(count: 100, maxCount: 9, offset: Offset(menuData.textDirection == .rtl ? 2 : -2, -4), child: tile),
-        ),
-        SideMenuTileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
-        SideMenuTileData(
-          onTap: () {
-            showAdaptiveAboutDialog(context: context);
-          },
-          title: 'About',
-          leading: const Icon(Icons.info_outline, size: 18),
-          selectedLeading: const Icon(Icons.info, size: 18),
-        ),
-        SideMenuTileData(
-          onTap: () {
-            showLicensePage(context: context);
-          },
-          title: 'Licenses',
-          leading: const Icon(Icons.copyright_outlined, size: 18),
-          selectedLeading: const Icon(Icons.copyright, size: 18),
-        ),
+        const Divider(thickness: .5),
       ],
     );
   },
+  footer: (_, isOpen) {
+    return Column(
+      mainAxisAlignment: .end,
+      crossAxisAlignment: .start,
+      children: [
+        const Divider(thickness: .5),
+        Text('v1.0.1+1', style: TextStyle(fontSize: isOpen ? 12 : 10)),
+      ],
+    );
+  },
+  items: [
+    TileData(
+      title: 'User management',
+      leading: const Icon(Icons.person_outline, size: 18),
+      selectedLeading: const Icon(Icons.person, size: 18),
+      subTiles: [
+        SubTileData(title: 'Customers'),
+        SubTileData(
+          title: 'Employees',
+          subTiles: [
+            SubTileData(title: 'Drivers'),
+            SubTileData(title: 'HR'),
+            SubTileData(title: 'Accountants'),
+            SubTileData(title: 'Marketing'),
+          ],
+        ),
+        SubTileData(
+          title: 'Admins',
+          subTiles: [
+            SubTileData(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sudo')));
+              },
+              title: 'Sudo',
+              leading: const Icon(Icons.shield, size: 18),
+            ),
+            SubTileData(title: 'Super-admins'),
+            SubTileData(title: 'Admins'),
+          ],
+        ),
+        SubTileData(title: 'Salaries', trailing: const Icon(Icons.attach_money, size: 18)),
+      ],
+    ),
+    //
+    const DividerData(),
+    const TitleData(title: 'OTHERS'),
+    TileData(onTap: () {}, title: 'Vehicle', leading: const Icon(Icons.car_rental, size: 18)),
+    TileData(
+      onTap: () {},
+      title: 'Conversations',
+      leading: const Icon(Icons.chat_bubble_outline, size: 18),
+      selectedLeading: const Icon(Icons.chat_bubble, size: 18),
+      badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: Offset(menutextDirection == .rtl ? 2 : -2, -4), child: tile),
+    ),
+    TileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
+    TileData(
+      onTap: () {
+        showAdaptiveAboutDialog(context: context);
+      },
+      title: 'About',
+      leading: const Icon(Icons.info_outline, size: 18),
+      selectedLeading: const Icon(Icons.info, size: 18),
+    ),
+    TileData(
+      onTap: () {
+        showLicensePage(context: context);
+      },
+      title: 'Licenses',
+      leading: const Icon(Icons.copyright_outlined, size: 18),
+      selectedLeading: const Icon(Icons.copyright, size: 18),
+    ),
+  ],
+  onIndexChanged: (index) {
+    debugPrint('current index: $index');
+  },
 ),
-
-
 ```
 
 ### Elements, types, usage and description
 
-| Element                            |  Type  |  Usage  |                                                                       Description |
-| :--------------------------------- | :----: | :-----: | --------------------------------------------------------------------------------: |
-| <a href="#0">SideMenu</a>          | Widget |  Menu   |                                                              The side menu widget |
-| <a href="#1">SideMenuStyle</a>     | Class  |  Style  |                                                              Menu container style |
-| <a href="#2">MenuTileStyle</a>     | Class  |  Style  |                                                                   Menu tile style |
-| <a href="#3">SubMenuTileStyle</a>  | Class  |  Style  |                                                               Menu sub-tile style |
-| <a href="#4">ToggleButtonStyle</a> | Class  |  Style  |                                      Toggle button style (to open/close the menu) |
-| SideMenuController                 | Class  |  Data   |                                                                   Menu controller |
-| SideMenuBuilderData                | Class  | Builder |                                                                      Menu builder |
-| SideMenuData                       | Class  |  Data   |                                                            Data to build the menu |
-| SideMenuTitleData                  | Class  |  Data   | Add a simple text with custom style (with no background or tap callback) to items |
-| SideMenuDividerData                | Class  |  Data   |                                              Add a custom divider widget to items |
-| SideMenuTileData                   | Class  |  Data   |                                                               Add a tile to items |
-| SideMenuSubTileData                | Class  |  Data   |                                         Add a sub-tile to tile (SideMenuTileData) |
-| TileBadgeBuilder                   | Class  | Builder |                                                   Data to build a badge on a tile |
-| CustomChildPosition                |  Enum  |  Enum   |                                                      Position of the custom child |
+| Element                            |  Type  |    Usage    |                                                                                               Description |
+| :--------------------------------- | :----: | :---------: | --------------------------------------------------------------------------------------------------------: |
+| <a href="#0">SideMenu</a>          | Widget | Menu widget |                                                                                      The side menu widget |
+| <a href="#1">SideMenuStyle</a>     | Class  |    Style    |                                                                                      Menu container style |
+| <a href="#2">MenuTileStyle</a>     | Class  |    Style    |                                                                                           Menu tile style |
+| <a href="#3">SubMenuTileStyle</a>  | Class  |    Style    |                                                                                       Menu sub-tile style |
+| <a href="#4">ToggleButtonStyle</a> | Class  |    Style    |                                                              Toggle button style (to open/close the menu) |
+| SideMenuController                 | Class  | Controller  |                                                                                           Menu controller |
+| TitleData                          | Class  |    Data     |                         Add a simple text with custom style (with no background or tap callback) to items |
+| DividerData                        | Class  |    Data     |                                                                      Add a custom divider widget to items |
+| TileData                           | Class  |    Data     |                                                                                       Add a tile to items |
+| SubTileData                        | Class  |    Data     |                                                                         Add a sub-tile to tile (TileData) |
+| TileBadgeBuilder                   | Class  |   Builder   |                                                                           Data to build a badge on a tile |
+| CustomChildPosition                |  Enum  |    Enum     |                                            Position of the custom child related to items (above or below) |
+| AutoOpenFrom                       |  Enum  |    Enum     | Set from what screen width the menu should adapt when <a href="#ref1">defaultBehaviour</a> is set to auto |
 
 <br>
+
+### Class, parameters, types and defaults
+
 <table>
+  <!-- header -->
   <tr>
-    <th>Style class</th>
+    <th>Class</th>
     <th>Parameters</th>
-    <th>Type</th>
-    <th>Default</th>
+    <th>Types</th>
+    <th>Defaults</th>
   </tr>
 
-  <!--  -->
+  <!-- SideMenu -->
   <tr id="0">
-    <td rowspan="10">SideMenu</td>
-    <td>builder</td>
-    <td>SideMenuBuilder</td>
-    <td>none</td>
+    <td rowspan="17">SideMenu</td>
+    <td>header</td>
+    <td>MenuHeaderBuilder?</td>
+    <td>null</td>
+  </tr>
+  <tr>
+    <td>footer</td>
+    <td>MenuHeaderBuilder?</td>
+    <td>null</td>
+  </tr>
+  <tr>
+    <td>customMenuChild</td>
+    <td>CustomMenuChild?</td>
+    <td>null</td>
+  </tr>
+  <tr>
+    <td>items</td>
+    <td>List&lt;SideMenuItem&gt;</td>
+    <td>const []</td>
+  </tr>
+  <tr>
+    <td>spacerAfterItems</td>
+    <td>Spacer?</td>
+    <td>null</td>
+  </tr>
+  <tr>
+    <td>onIndexChanged</td>
+    <td>ValueChanged&lt;int&gt;?</td>
+    <td>null</td>
   </tr>
   <tr>
     <td>controller</td>
@@ -196,9 +253,14 @@ SideMenu(
     <td>null</td>
   </tr>
   <tr>
-    <td>defaultBehaviour</td>
+    <td id="ref1">defaultBehaviour</td>
     <td>MenuBehaviour</td>
     <td>MenuBehaviour.auto</td>
+  </tr>
+  <tr>
+    <td>autoFrom</td>
+    <td>AutoOpenFrom</td>
+    <td>AutoOpenFrom.tablet</td>
   </tr>
   <tr>
     <td>minWidth</td>
@@ -226,6 +288,11 @@ SideMenu(
     <td>MenuConstants.duration</td>
   </tr>
   <tr>
+    <td>animationCurve</td>
+    <td>Curve</td>
+    <td>Curves.linear</td>
+  </tr>
+  <tr>
     <td>menuStyle</td>
     <td>SideMenuStyle?</td>
     <td>null</td>
@@ -236,7 +303,7 @@ SideMenu(
     <td>null</td>
   </tr>
 
-  <!--  -->
+  <!-- SideMenuStyle -->
   <tr id="1">
     <td rowspan="7">SideMenuStyle</td>
     <td>backgroundColor</td>
@@ -274,7 +341,7 @@ SideMenu(
     <td>null</td>
   </tr>
 
-  <!--  -->
+  <!-- MenuTileStyle -->
   <tr id="2">
     <td rowspan="17">MenuTileStyle</td>
     <td>titleStyle</td>
@@ -362,7 +429,7 @@ SideMenu(
     <td>MenuConstants.horizontalSpacing</td>
   </tr>
   
-  <!--  -->
+  <!-- SubMenuTileStyle -->
   <tr id="3">
     <td rowspan="15">SubMenuTileStyle</td>
     <td>titleStyle</td>
@@ -440,9 +507,9 @@ SideMenu(
     <td>MenuConstants.subTileHeight</td>
   </tr>
 
-  <!--  -->
+  <!-- ToggleButtonStyle -->
   <tr id="4">
-    <td rowspan="5">ToggleButtonStyle</td>
+    <td rowspan="6">ToggleButtonStyle</td>
     <td>iconColor</td>
     <td>Color?</td>
     <td>null</td>
@@ -475,6 +542,6 @@ SideMenu(
 
 </table>
 
-## ⚠️ Warning
+## ⚠️Warning
 
 This package was only tested on Android, Linux and web so feedback is needed for other platforms.

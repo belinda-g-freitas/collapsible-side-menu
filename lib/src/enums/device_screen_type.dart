@@ -7,9 +7,7 @@ enum DeviceScreenType {
 
   final int breakpoint;
 
-  static bool isDesktop(double width) => width >= DeviceScreenType.desktop.breakpoint;
+  static bool fromDesktop(double width) => width >= DeviceScreenType.desktop.breakpoint;
 
-  static bool isTablet(double width) => width >= DeviceScreenType.tablet.breakpoint && width < DeviceScreenType.desktop.breakpoint;
-
-  static bool isMobile(double width) => width >= DeviceScreenType.mobile.breakpoint && width < DeviceScreenType.tablet.breakpoint;
+  static bool fromTablet(double width) => width >= DeviceScreenType.tablet.breakpoint;
 }

@@ -55,49 +55,6 @@ class MenuTileStyle extends BaseTileStyle {
     );
   }
 
-  MenuTileStyle copyWith({
-    TextStyle? titleStyle,
-    TextStyle? selectedTitleStyle,
-    Color? color,
-    Color? selectedColor,
-    Color? hoverColor,
-    Color? backgroundColor,
-    Color? selectedBackgroundColor,
-    BorderRadius? borderRadius,
-    double? tileHeight,
-    double? subTileHeight,
-    Decoration? decoration,
-    Decoration? selectedDecoration,
-    Decoration? selectedIndicator,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    SubMenuTileStyle? subTileStyle,
-    double? horizontalSpacing,
-  }) {
-    return MenuTileStyle(
-      titleStyle: titleStyle ?? this.titleStyle,
-      selectedTitleStyle: selectedTitleStyle ?? this.selectedTitleStyle,
-      color: color ?? this.color,
-      selectedColor: selectedColor ?? this.selectedColor,
-      hoverColor: hoverColor ?? this.hoverColor,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      selectedBackgroundColor: selectedBackgroundColor ?? this.selectedBackgroundColor,
-      borderRadius: borderRadius ?? this.borderRadius,
-      tileHeight: tileHeight ?? this.tileHeight,
-      subTileHeight: subTileHeight ?? this.subTileHeight,
-      decoration: decoration ?? this.decoration,
-      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
-      selectedIndicator: selectedIndicator ?? this.selectedIndicator,
-      padding: padding ?? this.padding,
-      margin: margin ?? this.margin,
-      subTileStyle: subTileStyle ?? this.subTileStyle,
-      horizontalSpacing: horizontalSpacing ?? this.horizontalSpacing,
-    );
-  }
-
-  @override
-  String toString() => 'MenuTileStyle(subTileHeight: $subTileHeight, subTileStyle: $subTileStyle)';
-
   @override
   bool operator ==(covariant MenuTileStyle other) {
     if (identical(this, other)) return true;

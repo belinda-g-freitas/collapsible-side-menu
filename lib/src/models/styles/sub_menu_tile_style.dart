@@ -72,47 +72,6 @@ class SubMenuTileStyle extends BaseTileStyle {
     );
   }
 
-  SubMenuTileStyle copyWith({
-    TextStyle? titleStyle,
-    TextStyle? selectedTitleStyle,
-    Color? color,
-    Color? selectedColor,
-    Color? hoverColor,
-    Color? backgroundColor,
-    Color? selectedBackgroundColor,
-    BorderRadius? borderRadius,
-    double? tileHeight,
-    Decoration? decoration,
-    Decoration? selectedDecoration,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    SubMenuTileStyle? defaultSubTilesStyle,
-    double? horizontalSpacing,
-  }) {
-    return SubMenuTileStyle(
-      titleStyle: titleStyle ?? this.titleStyle,
-      selectedTitleStyle: selectedTitleStyle ?? this.selectedTitleStyle,
-      color: color ?? this.color,
-      selectedColor: selectedColor ?? this.selectedColor,
-      hoverColor: hoverColor ?? this.hoverColor,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      selectedBackgroundColor: selectedBackgroundColor ?? this.selectedBackgroundColor,
-      borderRadius: borderRadius ?? this.borderRadius,
-      tileHeight: tileHeight ?? this.tileHeight,
-      decoration: decoration ?? this.decoration,
-      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
-      padding: padding ?? this.padding,
-      margin: margin ?? this.margin,
-      defaultSubTilesStyle: defaultSubTilesStyle ?? this.defaultSubTilesStyle,
-      horizontalSpacing: horizontalSpacing ?? this.horizontalSpacing,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'SubMenuTileStyle(titleStyle: $titleStyle, selectedTitleStyle: $selectedTitleStyle, color: $color, selectedColor: $selectedColor, hoverColor: $hoverColor, backgroundColor: $backgroundColor, selectedBackgroundColor: $selectedBackgroundColor, borderRadius: $borderRadius, tileHeight: $tileHeight, decoration: $decoration, selectedDecoration: $selectedDecoration, padding: $padding, margin: $margin, defaultSubTilesStyle: $defaultSubTilesStyle, horizontalSpacing: $horizontalSpacing)';
-  }
-
   @override
   bool operator ==(covariant SubMenuTileStyle other) {
     if (identical(this, other)) return true;

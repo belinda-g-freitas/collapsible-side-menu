@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 class MenuConstants {
-  /// Size
+  /// Sizes
   static const double minWidth = 50;
   static const double maxWidth = 250;
 
-  /// zeroWidth = 0
-  static const double zeroWidth = 0;
   static const double radius = 10;
   static const double tileHeight = 40;
   static const double subTileHeight = 30;
@@ -16,7 +14,7 @@ class MenuConstants {
   static const double horizontalSpacing = 3;
 
   /// Durations
-  static const Duration duration = Duration(milliseconds: 400);
+  static const Duration duration = Duration(milliseconds: 250);
 
   /// Colors
   // static const Color selectedColor = AppColors.appColor;
