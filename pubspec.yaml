@@ -21,11 +21,11 @@ dev_dependencies:
 
 screenshots:
   - description: 'Mobile'
-  - path: 'assets/collapsible_side_menu_android.gif'
+    path: 'assets/collapsible_side_menu_android.gif'
   - description: 'Desktop'
-  - path: 'assets/collapsible_side_menu_desktop.gif'
+    path: 'assets/collapsible_side_menu_desktop.gif'
   - description: 'Web'
-  - path: 'assets/collapsible_side_menu_web.png'
+    path: 'assets/collapsible_side_menu_web.png'
 
 topics:
   - menu
