@@ -605,7 +605,7 @@ void _widgetTests() {
   group('CollapsibleSideMenu — header & footer', () {
     testWidgets('header is rendered', (tester) async {
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, header: (_, __) => const Text('MyHeader'))),
+        _wrap(CollapsibleSideMenu(defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, header: (_, _) => const Text('MyHeader'))),
       );
       await tester.pumpAndSettle();
       expect(find.text('MyHeader'), findsOneWidget);

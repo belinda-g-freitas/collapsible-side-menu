@@ -1,6 +1,6 @@
 [![pub package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dartlang.org/packages/collapsible_side_menu)
-<a href="https://githubc.com/belinda-g-freitas/collapsible_side_menu/issues?q=is%3Aissue+is%3Aclosed"><img src="https://img.shields.io/github/issues-closed-raw/belinda-g-freitas/collapsible_side_menu" alt="GitHub closed issues"></a>
-<a href="https://github.com/belinda-g-freitas/collapsible_side_menu"><img src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible_side_menu?logo=github&labelColor=333940" alt="contributors"></a>
+<a href="https://github.com/belinda-g-freitas/collapsible-side-menu/issues"><img src="https://img.shields.io/github/issues/belinda-g-freitas/collapsible-side-menu" alt="GitHub issues"></a>
+<a href="https://github.com/belinda-g-freitas/collapsible-side-menu"><img src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible-side-menu?logo=github&labelColor=333940" alt="contributors"></a>
 
 # collapsible_side_menu
 
@@ -541,6 +541,8 @@ CollapsibleSideMenu(
   </tr>
 
 </table>
+
+<br>
 
 ## ⚠️Warning
 
