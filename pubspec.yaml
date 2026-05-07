@@ -20,11 +20,11 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 screenshots:
-  - description: 'Mobile'
+  - description: 'Mobile demo gif'
     path: 'assets/collapsible_side_menu_android.gif'
-  - description: 'Desktop'
+  - description: 'Desktop demo gif'
     path: 'assets/collapsible_side_menu_desktop.gif'
-  - description: 'Web'
+  - description: 'Web demo gif'
     path: 'assets/collapsible_side_menu_web.png'
 
 topics:
