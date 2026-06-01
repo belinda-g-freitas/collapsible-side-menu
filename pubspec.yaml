@@ -1,6 +1,6 @@
 name: collapsible_side_menu
 description: "A Flutter customizable collapsible side menu with sub-menus and text direction features."
-version: 1.0.0+2
+version: 1.0.1
 
 repository: https://github.com/belinda-g-freitas/collapsible-side-menu.git
 issue_tracker: https://github.com/belinda-g-freitas/collapsible-side-menu/issues
