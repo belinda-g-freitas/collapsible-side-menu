@@ -48,3 +48,8 @@ Set :
 - inner and outer padding
 - sub-tiles' default style
 - etc.
+
+## 1.0.0+2
+  
+  - Fix some directionality issues
+  - Add Codecov

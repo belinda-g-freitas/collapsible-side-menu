@@ -1,0 +1,33 @@
+name: Publish package to pub.dev
+
+on:
+  release:
+    types: [ published ] # triggers when you create a GitHub Release
+
+jobs:
+  publish:
+    permissions:
+      id-token: write # Required for authentication using OIDC
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Validate package (dry run)
+        run: flutter pub publish --dry-run
+
+      - name: Publish
+        run: flutter pub publish --force
+        # uses: k-paxian/dart-package-publisher@master
+        # with:
+        #   credentialJson: ${{ secrets.PUB_CREDENTIALS }}

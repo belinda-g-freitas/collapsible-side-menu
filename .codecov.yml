@@ -1,0 +1,26 @@
+codecov:
+  notify:
+    require_ci_to_pass: yes
+
+coverage:
+  # How many decimal places to show in coverage percentages
+  precision: 2
+  # When rounding that decimal
+  round: nearest
+  range: '70...100'
+
+  status:
+    project: yes
+    patch: yes
+    changes: no
+
+comment:
+  require_changes: true
+  layout: 'header, diff'
+  behavior: default
+
+# Ignore all the file inside the example and
+# end eventually also the autogenerate file
+ignore:
+  - '**/example/'
+  - '**/*.g.dart'

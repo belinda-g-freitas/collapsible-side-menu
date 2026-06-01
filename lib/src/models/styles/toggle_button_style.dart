@@ -10,6 +10,10 @@ class ToggleButtonStyle {
   final double topPosition;
   final double opacity;
   final double iconSize;
+
+  /// If you want your button to support RTL, don't forget to add a [IconData] with `matchTextDirection = true`
+  ///
+  /// Else you'll have to manage icon rotation yourself
   final IconData? icon;
   final Color? backgroundColor;
 

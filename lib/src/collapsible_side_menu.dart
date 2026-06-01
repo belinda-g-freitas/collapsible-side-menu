@@ -248,11 +248,8 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       ),
     );
 
-    if (_menuStyle.textDirection != null) {
-      return Directionality(textDirection: widget.menuStyle!.textDirection!, child: content);
-    }
-
-    return content;
+    // set directionality
+    return Directionality(textDirection: _menuStyle.textDirection ?? Directionality.of(context), child: content);
   }
 
   Widget _buildMenuItem({required SideMenuItem tile, required int currentIndex, int? selectedIndex, required List<int> path, required bool isOpen}) {
@@ -348,13 +345,11 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   }
 
   Widget _hasToggleButton({required Widget child, required bool isOpen}) {
-    final TextDirection textDirection = _menuStyle.textDirection ?? Directionality.of(context);
-
     return Stack(
-      alignment: textDirection == .ltr ? .centerEnd : .centerStart,
+      alignment: .centerEnd,
       children: [
         child,
-        ToggleButton(style: widget.toggleButtonStyle, duration: widget.duration, textDirection: textDirection, isOpen: isOpen, onTap: _toggleMenu),
+        ToggleButton(style: widget.toggleButtonStyle, duration: widget.duration, isOpen: isOpen, onTap: _toggleMenu),
       ],
     );
   }

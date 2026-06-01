@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import '../models/styles/toggle_button_style.dart';
 
 class ToggleButton extends StatefulWidget {
-  const ToggleButton({super.key, required this.onTap, required this.textDirection, this.style, required this.isOpen, required this.duration});
+  const ToggleButton({super.key, required this.onTap, this.style, required this.isOpen, required this.duration});
 
   final void Function() onTap;
-  final TextDirection textDirection;
   final ToggleButtonStyle? style;
   final bool isOpen;
   final Duration duration;
@@ -16,7 +15,6 @@ class ToggleButton extends StatefulWidget {
 }
 
 class _ToggleButtonState extends State<ToggleButton> {
-  static const IconData _leftIcon = Icons.keyboard_double_arrow_left_rounded, _rightIcon = Icons.keyboard_double_arrow_right_rounded;
   late Widget _icon;
   late ToggleButtonStyle _buttonStyle;
   bool _visible = false, _isStyleInitialized = false;
@@ -42,11 +40,7 @@ class _ToggleButtonState extends State<ToggleButton> {
   Widget build(BuildContext context) {
     _icon = _buttonStyle.icon != null
         ? Icon(_buttonStyle.icon!, color: _buttonStyle.iconColor, size: _buttonStyle.iconSize)
-        : AnimatedRotation(
-            turns: widget.isOpen ? 0.5 : 0,
-            duration: widget.duration,
-            child: Icon(widget.textDirection == .ltr ? _rightIcon : _leftIcon, color: _buttonStyle.iconColor, size: _buttonStyle.iconSize),
-          );
+        : Icon(Icons.keyboard_double_arrow_left_rounded, color: _buttonStyle.iconColor, size: _buttonStyle.iconSize);
 
     return PositionedDirectional(
       top: _buttonStyle.topPosition,

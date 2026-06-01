@@ -6,7 +6,6 @@ const Color appColor = Color(0xFF_292CFF);
 const RoundedRectangleBorder roundedBorder = .new(borderRadius: .all(.circular(10)));
 
 void main() {
-
   runApp(const MainApp());
 }
 
@@ -59,7 +58,6 @@ class ExampleScreen extends StatefulWidget {
 }
 
 class _ExampleScreenState extends State<ExampleScreen> {
-  static const TextDirection menutextDirection = TextDirection.ltr;
   final _controller = SideMenuController();
 
   @override
@@ -72,7 +70,7 @@ class _ExampleScreenState extends State<ExampleScreen> {
           CollapsibleSideMenu(
             defaultIndex: 3,
             defaultBehaviour: .open,
-            menuStyle: SideMenuStyle(textDirection: menutextDirection),
+            menuStyle: SideMenuStyle(textDirection: .rtl),
             toggleButtonStyle: const ToggleButtonStyle(topPosition: 55, iconSize: 16),
             header: (_, isOpen) {
               return Column(
@@ -160,7 +158,7 @@ class _ExampleScreenState extends State<ExampleScreen> {
                 title: 'Conversations',
                 leading: const Icon(Icons.chat_bubble_outline, size: 18),
                 selectedLeading: const Icon(Icons.chat_bubble, size: 18),
-                badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: Offset(menutextDirection == .rtl ? 2 : -2, -4), child: tile),
+                badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: const Offset(-2, -4)),
               ),
               TileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
               TileData(

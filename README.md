@@ -1,6 +1,7 @@
-[![pub package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dartlang.org/packages/collapsible_side_menu)
+[![pub package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dev/packages/collapsible_side_menu)
+[![codecov](https://codecov.io/gh/belinda-g-freitas/collapsible-side-menu/branch/main/graph/badge.svg?token=XBhsIZBbZG)](https://codecov.io/gh/belinda-g-freitas/collapsible-side-menu)
 <a href="https://github.com/belinda-g-freitas/collapsible-side-menu/issues"><img src="https://img.shields.io/github/issues/belinda-g-freitas/collapsible-side-menu" alt="GitHub issues"></a>
-<a href="https://github.com/belinda-g-freitas/collapsible-side-menu"><img src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible-side-menu?logo=github&labelColor=333940" alt="contributors"></a>
+<img alt="GitHub contributors" src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible-side-menu?logo=github&labelColor=333940"></a>
 
 # collapsible_side_menu
 
