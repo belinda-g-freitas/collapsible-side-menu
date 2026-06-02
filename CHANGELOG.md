@@ -53,3 +53,6 @@ Set :
   
   - Fix some directionality issues
   - Add Codecov
+  
+## 1.0.2
+  - Fix toggle button rotation
