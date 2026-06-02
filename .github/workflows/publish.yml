@@ -26,23 +26,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
+      # - name: Set up Flutter
+      #   uses: subosito/flutter-action@v2
+      #   with:
+      #     channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      # - name: Validate package (dry run)
-      #   run: flutter pub publish --dry-run
+      # - name: Install dependencies
+      #   run: flutter pub get
 
       - name: Publish
-        # run: flutter pub publish --force
         uses: k-paxian/dart-package-publisher@master
         with:
           accessToken: ${{ secrets.OAUTH_ACCESS_TOKEN }}
           refreshToken: ${{ secrets.OAUTH_REFRESH_TOKEN }}
           credentialJson: ${{ secrets.PUB_CREDENTIALS }}
-          format: true
+          flutter: true
           skipTests: true
