@@ -56,3 +56,6 @@ Set :
   
 ## 1.0.2
   - Fix toggle button rotation
+
+## 1.0.3
+  - Fix toggle button's default icon

@@ -43,7 +43,7 @@ class _ToggleButtonState extends State<ToggleButton> {
         : AnimatedRotation(
             turns: widget.isOpen ? 0.5 : 0,
             duration: widget.duration,
-            child: Icon(Icons.keyboard_double_arrow_left_rounded, color: _buttonStyle.iconColor, size: _buttonStyle.iconSize),
+            child: Icon(Icons.keyboard_double_arrow_right_rounded, color: _buttonStyle.iconColor, size: _buttonStyle.iconSize),
           );
 
     return PositionedDirectional(
