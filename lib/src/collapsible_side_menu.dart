@@ -58,8 +58,8 @@ class CollapsibleSideMenu extends StatefulWidget {
     this.spacerAfterItems,
     this.onIndexChanged,
     this.controller,
-    this.defaultBehaviour = .auto,
-    this.autoFrom = .tablet,
+    this.defaultBehaviour = MenuBehaviour.auto,
+    this.autoFrom = AutoOpenFrom.tablet,
     this.minWidth = MenuConstants.minWidth,
     this.maxWidth = MenuConstants.maxWidth,
     this.hasToggleButton = true,
@@ -248,8 +248,10 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       ),
     );
 
-    // set directionality
-    return Directionality(textDirection: _menuStyle.textDirection ?? Directionality.of(context), child: content);
+    // set directionality if specified in menu style, else inherit it from context
+    if (_menuStyle.textDirection != null) return Directionality(textDirection: _menuStyle.textDirection!, child: content);
+
+    return content;
   }
 
   Widget _buildMenuItem({required SideMenuItem tile, required int currentIndex, int? selectedIndex, required List<int> path, required bool isOpen}) {
@@ -295,7 +297,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       if (customChild != null)
         Expanded(
           flex: customChild.childFlex,
-          child: ColoredContent(key: const Key('customChild'), color: color, child: customChild.child),
+          child: ColoredContent(key: const Key('custom_child'), color: color, child: customChild.child),
         ),
       ?customChild?.spacerAfterChild,
     ];

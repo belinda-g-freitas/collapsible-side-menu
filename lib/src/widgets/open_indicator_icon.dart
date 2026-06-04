@@ -12,8 +12,8 @@ class OpenIndicatorIcon extends StatelessWidget {
     return ValueListenableBuilder<Set<String>>(
       valueListenable: openNodes,
       builder: (_, nodes, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-        child: Icon(nodes.contains(nodeKey) ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 14, color: color),
+        padding: const .fromLTRB(0, 0, 5, 0),
+        child: Icon(nodes.contains(nodeKey) ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 18, color: color),
       ),
     );
   }

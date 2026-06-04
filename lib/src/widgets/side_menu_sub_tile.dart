@@ -5,7 +5,6 @@ import '../models/data/side_menu_item.dart';
 import '../models/styles/sub_menu_tile_style.dart';
 import '../utils/menu_constants.dart';
 import '../utils/utils.dart';
-import 'colored_content.dart';
 import 'open_indicator_icon.dart';
 import 'sub_tile_widget.dart';
 
@@ -79,7 +78,13 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
         : Expanded(
             child: SizedBox(
               height: double.maxFinite,
-              child: ColoredContent(color: color, child: selectedLeading),
+              child: DefaultTextStyle.merge(
+                style: TextStyle(color: color),
+                child: IconTheme.merge(
+                  data: IconThemeData(color: color, size: tile.style?.trailingIconSize),
+                  child: Center(child: selectedLeading),
+                ),
+              ),
             ),
           );
   }
@@ -110,7 +115,13 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
       final Widget trailing = Expanded(
         child: SizedBox(
           height: double.maxFinite,
-          child: ColoredContent(color: color, child: tile.trailing!),
+          child: DefaultTextStyle.merge(
+            style: TextStyle(color: color),
+            child: IconTheme.merge(
+              data: IconThemeData(color: color, size: tile.style?.trailingIconSize),
+              child: Center(child: tile.trailing!),
+            ),
+          ),
         ),
       );
 
@@ -217,9 +228,9 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
             decoration: BoxDecoration(
               borderRadius: _style.borderRadius,
               border: Border(
-                left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
-                right: isRTL ? BorderSide(color: _style.color!, width: _style.openMenuLineWidth) : BorderSide.none,
-                bottom: BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
+                left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth),
+                right: isRTL ? BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth) : BorderSide.none,
+                bottom: BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth),
               ),
             ),
             child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
@@ -280,7 +291,7 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     // style
     properties.add(DiagnosticsProperty<BorderRadius?>('borderRadius', _style.borderRadius, defaultValue: null));
     properties.add(DoubleProperty('tileHeight', _style.tileHeight));
-    properties.add(DoubleProperty('openMenuLineWidth', _style.openMenuLineWidth));
+    properties.add(DoubleProperty('openMenuLineWidth', _style.selectedIndicatorWidth));
     // optional features
     properties.add(FlagProperty('hasBadge', value: tile.badgeBuilder != null, ifTrue: 'has badge'));
     properties.add(FlagProperty('hasLeading', value: tile.leading != null, ifTrue: 'has leading'));

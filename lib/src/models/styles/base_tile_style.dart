@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart' show BorderRadius, Color, Decoration, EdgeInsetsGeometry, TextStyle;
+
+import 'package:flutter/widgets.dart' show BorderRadius, Color, Decoration, EdgeInsetsGeometry, TextStyle;
 
 abstract class BaseTileStyle {
   /// The height of the tile.
@@ -37,6 +38,11 @@ abstract class BaseTileStyle {
   /// Selected indicator is a line that appears on the side of the selected tile. It can be used to indicate the selected tile in a more visually appealing way.
   final Decoration? selectedIndicator;
 
+  /// The decoration line at the side of the open tile
+  ///
+  /// Only apply to tiles with sub tiles
+  final double selectedIndicatorWidth;
+
   /// Inner padding
   final EdgeInsetsGeometry padding;
 
@@ -48,10 +54,11 @@ abstract class BaseTileStyle {
   /// It will be used when the menu is open. It will be ignored when the menu is closed.
   final double horizontalSpacing;
 
-  /// The decoration line at the side of the open tile
-  ///
-  /// Only apply to  tiles with sub tiles and when the menu is open
-  final double openMenuLineWidth;
+  /// The size of the leading icon
+  final double? leadingIconSize;
+
+  /// The size of the trailing icon
+  final double? trailingIconSize;
 
   const BaseTileStyle({
     required this.tileHeight,
@@ -69,6 +76,8 @@ abstract class BaseTileStyle {
     required this.padding,
     required this.margin,
     required this.horizontalSpacing,
-    this.openMenuLineWidth = 0.5,
+    this.selectedIndicatorWidth = 0.5,
+    this.leadingIconSize,
+    this.trailingIconSize,
   });
 }

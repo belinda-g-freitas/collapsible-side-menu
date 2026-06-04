@@ -13,7 +13,7 @@ class ColoredContent extends StatelessWidget {
 
     return DefaultTextStyle.merge(
       style: TextStyle(color: color),
-      child: IconTheme(
+      child: IconTheme.merge(
         data: IconThemeData(color: color),
         child: child!,
       ),

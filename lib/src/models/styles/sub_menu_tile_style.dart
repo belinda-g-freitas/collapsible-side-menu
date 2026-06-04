@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart' show EdgeInsetsGeometry;
+
 import '../../utils/menu_constants.dart';
 import 'base_tile_style.dart';
 import 'menu_tile_style.dart';
@@ -16,11 +18,13 @@ class SubMenuTileStyle extends BaseTileStyle {
     super.borderRadius = MenuConstants.borderRadius,
     super.decoration,
     super.selectedDecoration,
-    super.padding = .zero,
+    super.padding = EdgeInsetsGeometry.zero,
     super.margin = MenuConstants.tileMargin,
     super.horizontalSpacing = MenuConstants.horizontalSpacing,
     this.defaultSubTilesStyle,
     super.tileHeight = MenuConstants.subTileHeight,
+    super.leadingIconSize,
+    super.trailingIconSize,
   }) : assert(padding.isNonNegative),
        assert(margin.isNonNegative),
        assert(decoration == null || decoration.debugAssertIsValid()),
@@ -45,6 +49,9 @@ class SubMenuTileStyle extends BaseTileStyle {
       margin: style.margin,
       defaultSubTilesStyle: defaultSubTilesStyle ?? style.defaultSubTilesStyle,
       horizontalSpacing: horizontalSpacing,
+      tileHeight: tileHeight,
+      leadingIconSize: leadingIconSize ?? style.leadingIconSize,
+      trailingIconSize: trailingIconSize ?? style.trailingIconSize,
     );
   }
 

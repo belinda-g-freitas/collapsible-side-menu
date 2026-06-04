@@ -6,7 +6,6 @@ import '../models/styles/menu_tile_style.dart';
 import '../models/styles/sub_menu_tile_style.dart';
 import '../utils/menu_constants.dart';
 import '../utils/utils.dart';
-import 'colored_content.dart';
 import 'open_indicator_icon.dart';
 import 'side_menu_sub_tile.dart';
 import 'sub_tile_widget.dart';
@@ -215,12 +214,17 @@ class _SideMenuTileState extends State<SideMenuTile> {
   //
   Widget? _leading(Color color) {
     final Widget? selectedLeading = widget.isSelected && tile.selectedLeading != null ? tile.selectedLeading : tile.leading;
-
     return selectedLeading != null
         ? Expanded(
             child: SizedBox(
               height: double.maxFinite,
-              child: ColoredContent(color: color, child: selectedLeading),
+              child: DefaultTextStyle.merge(
+                style: TextStyle(color: color),
+                child: IconTheme.merge(
+                  data: IconThemeData(color: color, size: _style.leadingIconSize),
+                  child: Center(child: selectedLeading),
+                ),
+              ),
             ),
           )
         : widget.isMenuOpen
@@ -266,7 +270,13 @@ class _SideMenuTileState extends State<SideMenuTile> {
         final Widget trailing = Expanded(
           child: SizedBox(
             height: double.maxFinite,
-            child: ColoredContent(color: color, child: tile.trailing!),
+            child: DefaultTextStyle.merge(
+              style: TextStyle(color: color),
+              child: IconTheme.merge(
+                data: IconThemeData(color: color, size: _style.trailingIconSize),
+                child: Center(child: tile.trailing!),
+              ),
+            ),
           ),
         );
 
@@ -463,9 +473,9 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 decoration: BoxDecoration(
                   borderRadius: _style.borderRadius,
                   border: Border(
-                    top: BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
-                    left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.openMenuLineWidth),
-                    right: isRTL ? BorderSide(color: _style.color!, width: _style.openMenuLineWidth) : BorderSide.none,
+                    top: BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth),
+                    left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth),
+                    right: isRTL ? BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth) : BorderSide.none,
                   ),
                 ),
                 child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles(_nodeKey)]),
