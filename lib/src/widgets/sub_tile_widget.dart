@@ -27,17 +27,36 @@ class SubTileWidget extends StatelessWidget {
 
   Widget? _leading() {
     final Widget? leading = (isSelected ? subTile.selectedLeading : null) ?? subTile.leading;
+    final double? iconSize = subStyle?.leadingIconSize ?? style.leadingIconSize;
 
-    return leading != null ? Flexible(child: leading) : null;
+    return leading != null
+        ? Flexible(
+            child: IconTheme.merge(
+              data: IconThemeData(size: iconSize),
+              child: leading,
+            ),
+          )
+        : null;
   }
 
-  Widget? _trailing() => subTile.trailing != null ? Expanded(child: subTile.trailing!) : null;
+  Widget? _trailing() {
+    final double? iconSize = subStyle?.trailingIconSize ?? style.trailingIconSize;
+    
+    return subTile.trailing != null
+        ? Expanded(
+            child: IconTheme.merge(
+              data: IconThemeData(size: iconSize),
+              child: subTile.trailing!,
+            ),
+          )
+        : null;
+  }
 
   TextStyle? _textStyle(BuildContext context) {
     return ((isSelected
                 ? (subStyle?.defaultSubTilesStyle?.selectedTitleStyle ?? subStyle?.selectedTitleStyle)
                 : (subStyle?.defaultSubTilesStyle?.titleStyle ?? subStyle?.titleStyle)) ??
-            TextTheme.of(context).labelSmall)
+            TextTheme.of(context).bodySmall)
         ?.copyWith(fontWeight: .w400, color: textColor);
   }
 

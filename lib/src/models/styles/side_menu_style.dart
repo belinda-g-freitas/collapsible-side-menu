@@ -22,7 +22,7 @@ class SideMenuStyle {
     this.textDirection,
     this.borderRadius = MenuConstants.borderRadius,
     this.padding = MenuConstants.menuInnerPadding,
-    this.margin = MenuConstants.outerPadding,
+    this.margin = MenuConstants.menuOuterPadding,
     this.defaultTileStyle,
   }) : assert(padding.isNonNegative),
        assert(margin.isNonNegative);

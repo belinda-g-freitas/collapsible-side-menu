@@ -1,5 +1,6 @@
-
 import 'package:flutter/widgets.dart' show BorderRadius, Color, Decoration, EdgeInsetsGeometry, TextStyle;
+
+import '../../utils/menu_constants.dart';
 
 abstract class BaseTileStyle {
   /// The height of the tile.
@@ -41,7 +42,7 @@ abstract class BaseTileStyle {
   /// The decoration line at the side of the open tile
   ///
   /// Only apply to tiles with sub tiles
-  final double selectedIndicatorWidth;
+  final double selectedBorderWidth;
 
   /// Inner padding
   final EdgeInsetsGeometry padding;
@@ -76,7 +77,7 @@ abstract class BaseTileStyle {
     required this.padding,
     required this.margin,
     required this.horizontalSpacing,
-    this.selectedIndicatorWidth = 0.5,
+    this.selectedBorderWidth = MenuConstants.selectedBorderWidth,
     this.leadingIconSize,
     this.trailingIconSize,
   });

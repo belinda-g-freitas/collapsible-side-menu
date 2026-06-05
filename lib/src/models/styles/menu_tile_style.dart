@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart' show EdgeInsetsGeometry;
+import 'package:flutter/widgets.dart' show EdgeInsetsGeometry, Size;
 
 import '../../utils/menu_constants.dart';
 import 'base_tile_style.dart';
@@ -6,6 +6,7 @@ import 'sub_menu_tile_style.dart';
 
 class MenuTileStyle extends BaseTileStyle {
   final double subTileHeight;
+  final Size selectedIndicatorSize;
   final SubMenuTileStyle? subTileStyle;
 
   MenuTileStyle({
@@ -20,6 +21,8 @@ class MenuTileStyle extends BaseTileStyle {
     super.decoration,
     super.selectedDecoration,
     super.selectedIndicator,
+    this.selectedIndicatorSize = MenuConstants.selectedIndicatorSize,
+    super.selectedBorderWidth,
     super.padding = EdgeInsetsGeometry.zero,
     super.margin = MenuConstants.tileMargin,
     this.subTileStyle,
@@ -28,7 +31,6 @@ class MenuTileStyle extends BaseTileStyle {
     super.horizontalSpacing = MenuConstants.horizontalSpacing,
     super.leadingIconSize,
     super.trailingIconSize,
-    super.selectedIndicatorWidth,
   }) : assert(padding.isNonNegative),
        assert(margin.isNonNegative),
        assert(decoration == null || decoration.debugAssertIsValid()),
@@ -59,7 +61,8 @@ class MenuTileStyle extends BaseTileStyle {
       subTileHeight: subTileHeight,
       leadingIconSize: leadingIconSize ?? style.leadingIconSize,
       trailingIconSize: trailingIconSize ?? style.trailingIconSize,
-      selectedIndicatorWidth: selectedIndicatorWidth,
+      selectedBorderWidth: selectedBorderWidth,
+      selectedIndicatorSize: selectedIndicatorSize,
     );
   }
 
@@ -83,7 +86,11 @@ class MenuTileStyle extends BaseTileStyle {
         other.padding == padding &&
         other.margin == margin &&
         other.subTileStyle == subTileStyle &&
-        other.horizontalSpacing == horizontalSpacing;
+        other.horizontalSpacing == horizontalSpacing &&
+        other.leadingIconSize == leadingIconSize &&
+        other.trailingIconSize == trailingIconSize &&
+        other.selectedBorderWidth == selectedBorderWidth &&
+        other.selectedIndicatorSize == selectedIndicatorSize;
   }
 
   @override
@@ -104,6 +111,10 @@ class MenuTileStyle extends BaseTileStyle {
         padding.hashCode ^
         margin.hashCode ^
         subTileStyle.hashCode ^
-        horizontalSpacing.hashCode;
+        horizontalSpacing.hashCode ^
+        leadingIconSize.hashCode ^
+        trailingIconSize.hashCode ^
+        selectedBorderWidth.hashCode ^
+        selectedIndicatorSize.hashCode;
   }
 }

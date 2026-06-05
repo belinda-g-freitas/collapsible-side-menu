@@ -210,7 +210,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     _defaultStyle = MenuTileStyle(
       hoverColor: colorScheme.onSecondaryContainer,
       color: _unselectedColor,
-      selectedColor: ThemeData.estimateBrightnessForColor(colorScheme.inversePrimary) == .light ? Colors.black : Colors.white,
+      selectedColor: ThemeData.estimateBrightnessForColor(colorScheme.inversePrimary) == .light ? MenuConstants.black : MenuConstants.white,
       titleStyle: const TextStyle(fontSize: 13.7),
       selectedTitleStyle: const TextStyle(fontSize: 13.7, fontWeight: .w500),
       subTileStyle: SubMenuTileStyle(
@@ -320,11 +320,12 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
             child: ValueListenableBuilder<_SelectionState>(
               valueListenable: _selection,
               builder: (_, selection, _) {
-                return ListView.builder(
+                return ListView.separated(
                   itemCount: _items.length,
                   itemBuilder: (_, i) {
                     return _buildMenuItem(tile: _items[i], currentIndex: i, selectedIndex: selection.index, path: selection.path, isOpen: isOpen);
                   },
+                  separatorBuilder: (_, _) => const SizedBox(height: MenuConstants.tilesVerticalSpacing),
                   addAutomaticKeepAlives: false,
                   addSemanticIndexes: false,
                 );
@@ -359,7 +360,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   Color _getUnSelectedColor(Color replacement) {
     final Color? bg = _menuStyle.backgroundColor;
 
-    if (bg != null) return ThemeData.estimateBrightnessForColor(bg) == .dark ? Colors.white : Colors.black;
+    if (bg != null) return ThemeData.estimateBrightnessForColor(bg) == .dark ? MenuConstants.white : MenuConstants.black;
     return replacement;
   }
 

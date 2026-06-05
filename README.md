@@ -280,7 +280,7 @@ CollapsibleSideMenu(
   </tr>
   <tr>
     <td>toggleButtonStyle</td>
-    <td>ToggleButtonStyle?</td>
+    <td><a href="#4">ToggleButtonStyle</a>?</td>
     <td>null</td>
   </tr>
   <tr>
@@ -295,7 +295,7 @@ CollapsibleSideMenu(
   </tr>
   <tr>
     <td>menuStyle</td>
-    <td>SideMenuStyle?</td>
+    <td><a href="#1">SideMenuStyle</a>?</td>
     <td>null</td>
   </tr>
   <tr>
@@ -334,17 +334,17 @@ CollapsibleSideMenu(
   <tr>
     <td>margin</td>
     <td>EdgeInsetsGeometry</td>
-    <td>MenuConstants.outerPadding</td>
+    <td>MenuConstants.menuOuterPadding</td>
   </tr>
   <tr>
     <td>defaultTileStyle</td>
-    <td>MenuTileStyle</td>
+    <td><a href="#2">MenuTileStyle</a></td>
     <td>null</td>
   </tr>
 
   <!-- MenuTileStyle -->
   <tr id="2">
-    <td rowspan="17">MenuTileStyle</td>
+    <td rowspan="20">MenuTileStyle</td>
     <td>titleStyle</td>
     <td>TextStyle?</td>
     <td>TextStyle(fontSize: 13.7)</td>
@@ -400,6 +400,11 @@ CollapsibleSideMenu(
     <td>BoxDecoration(borderRadius: MenuConstants.borderRadius) with the right color</td>
   </tr>
   <tr>
+    <td>selectedBorderWidth</td>
+    <td>double</td>
+    <td>MenuConstants.selectedBorderWidth</td>
+  </tr>
+  <tr>
     <td>padding</td>
     <td>EdgeInsetsGeometry</td>
     <td>EdgeInsets.zero</td>
@@ -429,10 +434,20 @@ CollapsibleSideMenu(
     <td>double</td>
     <td>MenuConstants.horizontalSpacing</td>
   </tr>
+  <tr>
+    <td>leadingIconSize</td>
+    <td>double?</td>
+    <td>null</td>
+  </tr>
+  <tr>
+    <td>trailingIconSize</td>
+    <td>double?</td>
+    <td>null</td>
+  </tr>
   
   <!-- SubMenuTileStyle -->
   <tr id="3">
-    <td rowspan="15">SubMenuTileStyle</td>
+    <td rowspan="18">SubMenuTileStyle</td>
     <td>titleStyle</td>
     <td>TextStyle?</td>
     <td>TextStyle(fontSize: 12.3)</td>
@@ -483,6 +498,11 @@ CollapsibleSideMenu(
     <td>BoxDecoration(color: colorScheme.secondaryContainer, borderRadius: MenuConstants.borderRadius)</td>
   </tr>
   <tr>
+    <td>selectedBorderWidth</td>
+    <td>double</td>
+    <td>MenuConstants.selectedBorderWidth</td>
+  </tr>
+  <tr>
     <td>padding</td>
     <td>EdgeInsetsGeometry</td>
     <td>EdgeInsets.zero</td>
@@ -507,6 +527,17 @@ CollapsibleSideMenu(
     <td>double</td>
     <td>MenuConstants.subTileHeight</td>
   </tr>
+  <tr>
+    <td>leadingIconSize</td>
+    <td>double?</td>
+    <td>null</td>
+  </tr>
+  <tr>
+    <td>trailingIconSize</td>
+    <td>double?</td>
+    <td>null</td>
+  </tr>
+
 
   <!-- ToggleButtonStyle -->
   <tr id="4">

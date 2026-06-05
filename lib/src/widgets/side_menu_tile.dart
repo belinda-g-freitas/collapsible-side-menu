@@ -7,7 +7,7 @@ import '../models/styles/sub_menu_tile_style.dart';
 import '../utils/menu_constants.dart';
 import '../utils/utils.dart';
 import 'open_indicator_icon.dart';
-import 'side_menu_sub_tile.dart';
+import 'side_menu_subtile.dart';
 import 'sub_tile_widget.dart';
 
 class SideMenuTile extends StatefulWidget {
@@ -167,22 +167,22 @@ class _SideMenuTileState extends State<SideMenuTile> {
       final path = [...parentPath, i];
       final isSelected = _isSelectedPath(path);
 
-      return subTile.subTiles.isEmpty
-          ? SubTileWidget(
-              key: ValueKey(path.join('-')),
-              subTile: subTile,
-              subStyle: subTile.style,
-              style: _style,
-              textColor: _getChildColor(isSelected),
-              isSelected: isSelected,
-              onTap: () {
-                subTile.onTap?.call();
-                widget.onSelectPath(path);
-              },
-            )
-          : Padding(
-              padding: subTile.style?.margin ?? const .fromSTEB(5, 0, 0, 0),
-              child: SideMenuSubTile(
+      return Padding(
+        padding: subTile.style?.margin ?? const .fromSTEB(5, 0, 0, 0),
+        child: subTile.subTiles.isEmpty
+            ? SubTileWidget(
+                key: ValueKey(path.join('-')),
+                subTile: subTile,
+                subStyle: subTile.style,
+                style: _style,
+                textColor: _getChildColor(isSelected),
+                isSelected: isSelected,
+                onTap: () {
+                  subTile.onTap?.call();
+                  widget.onSelectPath(path);
+                },
+              )
+            : SideMenuSubTile(
                 key: ValueKey(path.join('-')),
                 index: i,
                 isMenuOpen: widget.isMenuOpen,
@@ -193,7 +193,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 onToggle: widget.onToggle,
                 openNodes: widget.openNodes,
               ),
-            );
+      );
     });
   }
 
@@ -201,13 +201,16 @@ class _SideMenuTileState extends State<SideMenuTile> {
   Widget _tile(Color color) {
     final Widget? leading = _leading(color);
 
-    return Row(
-      spacing: _style.horizontalSpacing,
-      children: [
-        ?leading,
-        ?_title(color, hasLeading: leading != null),
-        ...?_trailing(color),
-      ],
+    return DefaultTextStyle.merge(
+      style: TextStyle(color: color),
+      child: Row(
+        spacing: _style.horizontalSpacing,
+        children: [
+          ?leading,
+          ?_title(color, hasLeading: leading != null),
+          ...?_trailing(color),
+        ],
+      ),
     );
   }
 
@@ -218,11 +221,10 @@ class _SideMenuTileState extends State<SideMenuTile> {
         ? Expanded(
             child: SizedBox(
               height: double.maxFinite,
-              child: DefaultTextStyle.merge(
-                style: TextStyle(color: color),
+              child: Center(
                 child: IconTheme.merge(
                   data: IconThemeData(color: color, size: _style.leadingIconSize),
-                  child: Center(child: selectedLeading),
+                  child: selectedLeading,
                 ),
               ),
             ),
@@ -231,10 +233,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
         ? null
         : Expanded(
             child: Center(
-              child: Text(
-                tile.title[0],
-                style: TextStyle(fontWeight: .w600, color: color),
-              ),
+              child: Text(tile.title[0], style: const TextStyle(fontWeight: .w600)),
             ),
           );
   }
@@ -270,11 +269,10 @@ class _SideMenuTileState extends State<SideMenuTile> {
         final Widget trailing = Expanded(
           child: SizedBox(
             height: double.maxFinite,
-            child: DefaultTextStyle.merge(
-              style: TextStyle(color: color),
+            child: Center(
               child: IconTheme.merge(
                 data: IconThemeData(color: color, size: _style.trailingIconSize),
-                child: Center(child: tile.trailing!),
+                child: tile.trailing!,
               ),
             ),
           ),
@@ -310,9 +308,9 @@ class _SideMenuTileState extends State<SideMenuTile> {
 
     // selected line
     final Widget line = decoration != null
-        ? Container(constraints: BoxConstraints.loose(tile.selectedIndicatorSize), decoration: decoration)
+        ? Container(constraints: BoxConstraints.loose(_style.selectedIndicatorSize), decoration: decoration)
         : Container(
-            constraints: BoxConstraints.loose(tile.selectedIndicatorSize),
+            constraints: BoxConstraints.loose(_style.selectedIndicatorSize),
             decoration: BoxDecoration(borderRadius: MenuConstants.borderRadius, color: color),
           );
 
@@ -473,15 +471,23 @@ class _SideMenuTileState extends State<SideMenuTile> {
                 decoration: BoxDecoration(
                   borderRadius: _style.borderRadius,
                   border: Border(
-                    top: BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth),
-                    left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth),
-                    right: isRTL ? BorderSide(color: _style.color!, width: _style.selectedIndicatorWidth) : BorderSide.none,
+                    top: BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
+                    left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
+                    right: isRTL ? BorderSide(color: _style.color!, width: _style.selectedBorderWidth) : BorderSide.none,
                   ),
                 ),
-                child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles(_nodeKey)]),
+                child: Padding(
+                  padding: const .only(top: MenuConstants.tilesVerticalSpacing), // spacing between tile and sub-tiles
+                  child: Column(
+                    crossAxisAlignment: .start,
+                    mainAxisSize: .min,
+                    spacing: MenuConstants.tilesVerticalSpacing,
+                    children: _subTiles(_nodeKey),
+                  ),
+                ),
               ),
               builder: (_, nodes, child) {
-                // We set maintainState to true to keep sub-menus states (selected sub-tile and opened sub-menu)
+                // We set maintainState to true to keep sub-menus states (selected sub-tile and opened sub-menus)
                 return Visibility(visible: widget.isMenuOpen && _isSubTileSelected(nodes), maintainState: true, child: child!);
               },
             ),

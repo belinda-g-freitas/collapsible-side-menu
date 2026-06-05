@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/menu_constants.dart';
+
 class OpenIndicatorIcon extends StatelessWidget {
   const OpenIndicatorIcon({super.key, required this.nodeKey, required this.openNodes, required this.color});
 
@@ -13,7 +15,11 @@ class OpenIndicatorIcon extends StatelessWidget {
       valueListenable: openNodes,
       builder: (_, nodes, _) => Padding(
         padding: const .fromLTRB(0, 0, 5, 0),
-        child: Icon(nodes.contains(nodeKey) ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 18, color: color),
+        child: AnimatedRotation(
+          turns: nodes.contains(nodeKey) ? 0.5 : 0,
+          duration: MenuConstants.duration,
+          child: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: color),
+        ),
       ),
     );
   }

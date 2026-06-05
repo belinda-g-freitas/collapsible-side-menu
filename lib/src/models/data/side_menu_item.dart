@@ -1,8 +1,6 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
-import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, Size, TextAlign, TextStyle, VoidCallback, Widget;
+import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, TextAlign, TextStyle, VoidCallback, Widget;
 
-import '../../utils/menu_constants.dart';
 import '../styles/menu_tile_style.dart';
 import '../styles/sub_menu_tile_style.dart';
 
@@ -48,7 +46,6 @@ class DividerData extends SideMenuItem {
 }
 
 class TileData extends SideMenuItem with _BaseSideMenuData {
-  final Size selectedIndicatorSize;
   final bool hasSelectedIndicator;
   final MenuTileStyle? style;
   final List<SubTileData> subTiles;
@@ -81,7 +78,7 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
     this.subTiles = const [],
     this.badgeBuilder,
     this.onTap,
-    this.selectedIndicatorSize = const Size(MenuConstants.selectedIndicatorWidth, MenuConstants.selectedIndicatorHeight),
+
     this.hasSelectedIndicator = true,
   });
 
@@ -96,7 +93,6 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
       subTiles: subTiles,
       badgeBuilder: badgeBuilder,
       onTap: onTap,
-      selectedIndicatorSize: selectedIndicatorSize,
       hasSelectedIndicator: hasSelectedIndicator,
     );
   }
@@ -108,7 +104,6 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
     Widget? trailing,
     TileBadgeBuilder? badgeBuilder,
     VoidCallback? onTap,
-    Size? selectedIndicatorSize,
     bool? hasSelectedIndicator,
     MenuTileStyle? style,
     List<SubTileData>? subTiles,
@@ -121,7 +116,6 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
       trailing: trailing ?? this.trailing,
       badgeBuilder: badgeBuilder ?? this.badgeBuilder,
       onTap: onTap ?? this.onTap,
-      selectedIndicatorSize: selectedIndicatorSize ?? this.selectedIndicatorSize,
       hasSelectedIndicator: hasSelectedIndicator ?? this.hasSelectedIndicator,
       style: style ?? this.style,
       subTiles: subTiles ?? this.subTiles,
@@ -139,7 +133,6 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
         other.trailing == trailing &&
         other.badgeBuilder == badgeBuilder &&
         other.onTap == onTap &&
-        other.selectedIndicatorSize == selectedIndicatorSize &&
         other.hasSelectedIndicator == hasSelectedIndicator &&
         other.style == style &&
         listEquals(other.subTiles, subTiles) &&
@@ -154,7 +147,6 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
         trailing.hashCode ^
         badgeBuilder.hashCode ^
         onTap.hashCode ^
-        selectedIndicatorSize.hashCode ^
         hasSelectedIndicator.hashCode ^
         style.hashCode ^
         subTiles.hashCode ^
