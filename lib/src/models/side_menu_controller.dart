@@ -1,4 +1,4 @@
-typedef VoidCallback = void Function();
+import '../utils/types.dart';
 
 class SideMenuController {
   late VoidCallback open;

@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart' show VoidCallback, listEquals;
-import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, TextAlign, TextStyle, VoidCallback, Widget;
+import 'package:flutter/foundation.dart' show listEquals;
+import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, TextAlign, TextStyle, Widget;
 
+import '../../utils/types.dart';
 import '../styles/menu_tile_style.dart';
 import '../styles/sub_menu_tile_style.dart';
 

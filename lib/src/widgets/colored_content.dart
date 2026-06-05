@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../utils/menu_constants.dart';
+
 class ColoredContent extends StatelessWidget {
-  /// Returns `const SizedBox.shrink()` if [child] is null
+  /// Returns `MenuConstants.emptyWidget` if [child] is null
   const ColoredContent({super.key, required this.color, this.child});
 
   final Color color;
@@ -9,7 +11,7 @@ class ColoredContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (child == null) return const SizedBox.shrink();
+    if (child == null) return MenuConstants.emptyWidget;
 
     return DefaultTextStyle.merge(
       style: TextStyle(color: color),

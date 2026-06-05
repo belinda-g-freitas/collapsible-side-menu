@@ -24,8 +24,12 @@ class MenuConstants {
   static const EdgeInsetsGeometry menuInnerPadding = .symmetric(horizontal: 7, vertical: 12.9);
   static const EdgeInsetsGeometry menuOuterPadding = .all(4);
 
-  // ORTHERS
+  // OTHERS
   static const Duration duration = Duration(milliseconds: 250);
   static const BorderRadius borderRadius = .all(.circular(radius));
   static const Size selectedIndicatorSize = Size(4, 20);
+  static const Widget emptyWidget = SizedBox.shrink();
+
+  /// Equivalent to [Icons.keyboard_double_arrow_right_rounded] but with matchTextDirection set to true.
+  static const IconData toggleButtonIcon = IconData(0xf0348, fontFamily: 'MaterialIcons', matchTextDirection: true);
 }

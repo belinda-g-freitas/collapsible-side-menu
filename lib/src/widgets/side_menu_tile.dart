@@ -16,8 +16,8 @@ class SideMenuTile extends StatefulWidget {
     required this.tile,
     required this.isSelected,
     required this.isMenuOpen,
-    required this.minWidth,
-    required this.sideMenuBackgroundColor,
+    required this.horizontalOffset,
+    required this.anchorBackgroundColor,
     required this.selectedPath,
     required this.basePath,
     required this.onSelectPath,
@@ -28,8 +28,8 @@ class SideMenuTile extends StatefulWidget {
   final TileData tile;
   final bool isSelected;
   final bool isMenuOpen;
-  final double minWidth;
-  final Color sideMenuBackgroundColor;
+  final double horizontalOffset;
+  final Color anchorBackgroundColor;
   final List<int> selectedPath;
   final List<int> basePath;
   final void Function(List<int> path) onSelectPath;
@@ -139,7 +139,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
             ((isSelected
                         ? (subStyle?.defaultSubTilesStyle?.selectedTitleStyle ?? subStyle?.selectedTitleStyle)
                         : (subStyle?.defaultSubTilesStyle?.titleStyle ?? subStyle?.titleStyle)) ??
-                    TextTheme.of(context).labelSmall)
+                    TextTheme.of(context).bodySmall)
                 ?.copyWith(fontWeight: .w400, color: textColor);
 
         return subTile.subTiles.isEmpty
@@ -240,7 +240,8 @@ class _SideMenuTileState extends State<SideMenuTile> {
 
   Widget? _title(Color color, {required bool hasLeading}) {
     if (widget.isMenuOpen) {
-      final TextStyle? textStyle = (widget.isSelected ? _style.selectedTitleStyle : _style.titleStyle) ?? TextTheme.of(context).bodySmall;
+      final TextStyle? textStyle =
+          (widget.isSelected ? _style.selectedTitleStyle : _style.titleStyle) ?? TextTheme.of(context).bodySmall;
 
       return Expanded(
         flex: 5,
@@ -367,8 +368,6 @@ class _SideMenuTileState extends State<SideMenuTile> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.of(context);
-    final menuTheme = MenuTheme.of(context);
-    final bool isRTL = Utils.isRTL(context);
     //
     final Decoration tileDecoration =
         (widget.isSelected ? _style.selectedDecoration : _style.decoration) ??
@@ -390,12 +389,12 @@ class _SideMenuTileState extends State<SideMenuTile> {
               border: .all(color: colorScheme.onSurface, width: .3),
             ),
             positionDelegate: (position) {
-              return isRTL
-                  ? Offset(
-                      position.target.dx - (position.tooltipSize.width + widget.minWidth / 2),
-                      position.target.dy - position.tooltipSize.height / 2,
-                    )
-                  : Offset(position.target.dx + widget.minWidth / 2, position.target.dy - position.tooltipSize.height / 2);
+              final double width = position.targetSize.width / 2 + widget.horizontalOffset, dx = position.target.dx;
+
+              return Offset(
+                Utils.isRTL(context) ? dx - (position.tooltipSize.width + width) : dx + width,
+                position.target.dy - position.tooltipSize.height / 2,
+              );
             },
             constraints: BoxConstraints(minHeight: _style.tileHeight / 1.5),
             child: view,
@@ -422,11 +421,11 @@ class _SideMenuTileState extends State<SideMenuTile> {
             ? viewWithTooltip
             : MenuTheme(
                 data: MenuThemeData(
-                  style: menuTheme.style?.copyWith(
+                  style: MenuTheme.of(context).style?.copyWith(
                     alignment: .topEnd,
                     elevation: .all(3),
                     side: .all(BorderSide(color: _anchorForegroundColor, width: .7)),
-                    backgroundColor: .all(widget.sideMenuBackgroundColor),
+                    backgroundColor: .all(widget.anchorBackgroundColor),
                     padding: .all(const .symmetric(horizontal: _anchorHorizPadding, vertical: 7)),
                   ),
                   submenuIcon: .all(Icon(Icons.arrow_forward_ios_rounded, size: 12, color: _anchorForegroundColor)),
@@ -435,8 +434,8 @@ class _SideMenuTileState extends State<SideMenuTile> {
                   controller: _menuController,
                   clipBehavior: .antiAlias,
                   menuChildren: _collapsedSubTiles(_anchorForegroundColor, _nodeKey),
-                  alignmentOffset: Offset(widget.minWidth / 7, 0),
-                  style: menuTheme.style?.copyWith(alignment: .topEnd),
+                  alignmentOffset: Offset(widget.horizontalOffset, 0),
+                  style: const MenuStyle(alignment: .topEnd),
                   child: InkWell(
                     borderRadius: _style.borderRadius,
                     onTap: () => _menuController.isOpen ? _menuController.close() : _menuController.open(),
@@ -470,10 +469,9 @@ class _SideMenuTileState extends State<SideMenuTile> {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: _style.borderRadius,
-                  border: Border(
+                  border: BorderDirectional(
                     top: BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
-                    left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
-                    right: isRTL ? BorderSide(color: _style.color!, width: _style.selectedBorderWidth) : BorderSide.none,
+                    start: BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
                   ),
                 ),
                 child: Padding(
@@ -497,6 +495,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
     );
   }
 
+  // coverage:ignore-start
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -507,13 +506,14 @@ class _SideMenuTileState extends State<SideMenuTile> {
     // state
     properties.add(FlagProperty('isSelected', value: widget.isSelected, ifTrue: 'selected'));
     properties.add(FlagProperty('isMenuOpen', value: widget.isMenuOpen, ifTrue: 'open', ifFalse: 'collapsed'));
-    properties.add(FlagProperty('_isSubTileSelected', value: _isSubTileSelected(widget.openNodes.value), ifTrue: 'subtile-expanded'));
+    properties.add(
+      FlagProperty('_isSubTileSelected', value: _isSubTileSelected(widget.openNodes.value), ifTrue: 'subtile-expanded'),
+    );
     // structure
     properties.add(IntProperty('subTileCount', subTiles.length));
     properties.add(IterableProperty<String>('openNodes', widget.openNodes.value));
     // layout
-    properties.add(DoubleProperty('minWidth', widget.minWidth));
-    properties.add(ColorProperty('sideMenuBackgroundColor', widget.sideMenuBackgroundColor));
+    properties.add(ColorProperty('sideMenuBackgroundColor', widget.anchorBackgroundColor));
     // style (only when available — style is assigned in build)
     if (mounted) {
       properties.add(DiagnosticsProperty<BorderRadius?>('borderRadius', _style.borderRadius, defaultValue: null));
@@ -526,4 +526,6 @@ class _SideMenuTileState extends State<SideMenuTile> {
     properties.add(FlagProperty('hasLeading', value: tile.leading != null, ifTrue: 'has leading'));
     properties.add(FlagProperty('hasTrailing', value: tile.trailing != null, ifTrue: 'has trailing'));
   }
+
+  // coverage:ignore-end
 }

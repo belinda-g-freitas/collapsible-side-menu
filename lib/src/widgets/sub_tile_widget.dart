@@ -5,6 +5,7 @@ import '../models/data/side_menu_item.dart';
 import '../models/styles/base_tile_style.dart';
 import '../models/styles/sub_menu_tile_style.dart';
 import '../utils/menu_constants.dart';
+import '../utils/types.dart';
 import 'colored_content.dart';
 
 class SubTileWidget extends StatelessWidget {
@@ -41,7 +42,7 @@ class SubTileWidget extends StatelessWidget {
 
   Widget? _trailing() {
     final double? iconSize = subStyle?.trailingIconSize ?? style.trailingIconSize;
-    
+
     return subTile.trailing != null
         ? Expanded(
             child: IconTheme.merge(
@@ -93,6 +94,7 @@ class SubTileWidget extends StatelessWidget {
     );
   }
 
+  // coverage:ignore-start
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -104,7 +106,11 @@ class SubTileWidget extends StatelessWidget {
     // style resolution
     properties.add(FlagProperty('hasSubStyle', value: subStyle != null, ifTrue: 'custom subStyle'));
     properties.add(
-      DiagnosticsProperty<BorderRadius?>('resolvedBorderRadius', subStyle?.borderRadius ?? MenuConstants.borderRadius, defaultValue: null),
+      DiagnosticsProperty<BorderRadius?>(
+        'resolvedBorderRadius',
+        subStyle?.borderRadius ?? MenuConstants.borderRadius,
+        defaultValue: null,
+      ),
     );
     properties.add(DoubleProperty('resolvedTileHeight', subStyle?.tileHeight ?? MenuConstants.subTileHeight));
     // optional features
@@ -112,4 +118,6 @@ class SubTileWidget extends StatelessWidget {
     properties.add(FlagProperty('hasSelectedLeading', value: subTile.selectedLeading != null, ifTrue: 'has selectedLeading'));
     properties.add(FlagProperty('hasTrailing', value: subTile.trailing != null, ifTrue: 'has trailing'));
   }
+
+  // coverage:ignore-end
 }

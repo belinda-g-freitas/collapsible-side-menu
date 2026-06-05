@@ -189,7 +189,11 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   }
 
   void _setDecoration() {
-    _decoration = BoxDecoration(color: _backgroundColor, boxShadow: [?_menuStyle.boxShadow], borderRadius: _menuStyle.borderRadius);
+    _decoration = BoxDecoration(
+      color: _backgroundColor,
+      boxShadow: [?_menuStyle.boxShadow],
+      borderRadius: _menuStyle.borderRadius,
+    );
   }
 
   void _attachController(SideMenuController controller) {
@@ -210,7 +214,9 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     _defaultStyle = MenuTileStyle(
       hoverColor: colorScheme.onSecondaryContainer,
       color: _unselectedColor,
-      selectedColor: ThemeData.estimateBrightnessForColor(colorScheme.inversePrimary) == .light ? MenuConstants.black : MenuConstants.white,
+      selectedColor: ThemeData.estimateBrightnessForColor(colorScheme.inversePrimary) == .light
+          ? MenuConstants.black
+          : MenuConstants.white,
       titleStyle: const TextStyle(fontSize: 13.7),
       selectedTitleStyle: const TextStyle(fontSize: 13.7, fontWeight: .w500),
       subTileStyle: SubMenuTileStyle(
@@ -254,7 +260,13 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     return content;
   }
 
-  Widget _buildMenuItem({required SideMenuItem tile, required int currentIndex, int? selectedIndex, required List<int> path, required bool isOpen}) {
+  Widget _buildMenuItem({
+    required SideMenuItem tile,
+    required int currentIndex,
+    int? selectedIndex,
+    required List<int> path,
+    required bool isOpen,
+  }) {
     final isSelected = currentIndex == selectedIndex;
 
     switch (tile) {
@@ -271,11 +283,11 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
         return RepaintBoundary(
           child: SideMenuTile(
             key: ValueKey(tile.id ?? 'tile_$currentIndex'),
-            minWidth: widget.minWidth,
+            horizontalOffset: _menuStyle.padding.horizontal / 2,
             isMenuOpen: isOpen,
             isSelected: isSelected,
             tile: tile.copyWith(style: style),
-            sideMenuBackgroundColor: _backgroundColor,
+            anchorBackgroundColor: _menuStyle.collapsedOverlayColor ?? _backgroundColor,
             // path handling
             basePath: [currentIndex],
             selectedPath: isSelected ? path : [],
@@ -286,7 +298,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
         );
 
       default:
-        return const SizedBox.shrink();
+        return MenuConstants.emptyWidget;
     }
   }
 
@@ -323,7 +335,13 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
                 return ListView.separated(
                   itemCount: _items.length,
                   itemBuilder: (_, i) {
-                    return _buildMenuItem(tile: _items[i], currentIndex: i, selectedIndex: selection.index, path: selection.path, isOpen: isOpen);
+                    return _buildMenuItem(
+                      tile: _items[i],
+                      currentIndex: i,
+                      selectedIndex: selection.index,
+                      path: selection.path,
+                      isOpen: isOpen,
+                    );
                   },
                   separatorBuilder: (_, _) => const SizedBox(height: MenuConstants.tilesVerticalSpacing),
                   addAutomaticKeepAlives: false,
@@ -442,6 +460,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     super.dispose();
   }
 
+  // coverage:ignore-start
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -464,4 +483,6 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       ..add(IntProperty('defaultIndex', widget.defaultIndex))
       ..add(FlagProperty('isOpen', value: _isMenuOpen, ifTrue: 'opened', ifFalse: 'collapsed'));
   }
+
+  // coverage:ignore-end
 }

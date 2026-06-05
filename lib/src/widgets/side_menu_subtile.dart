@@ -217,8 +217,6 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isRTL = Utils.isRTL(context);
-
     return Padding(
       padding: _style.margin,
       child: Material(
@@ -228,13 +226,20 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: _style.borderRadius,
-              border: Border(
-                left: isRTL ? BorderSide.none : BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
-                right: isRTL ? BorderSide(color: _style.color!, width: _style.selectedBorderWidth) : BorderSide.none,
+              border: BorderDirectional(
+                start: BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
                 bottom: BorderSide(color: _style.color!, width: _style.selectedBorderWidth),
               ),
             ),
-            child: Column(crossAxisAlignment: .start, mainAxisSize: .min, children: [const SizedBox(height: 2), ..._subTiles()]),
+            child: Padding(
+              padding: const .only(top: MenuConstants.tilesVerticalSpacing),
+              child: Column(
+                crossAxisAlignment: .start,
+                mainAxisSize: .min,
+                spacing: MenuConstants.tilesVerticalSpacing,
+                children: _subTiles(),
+              ),
+            ),
           ),
           builder: (_, nodes, child) {
             final isOpen = _isOpen(nodes);
@@ -275,6 +280,7 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     );
   }
 
+  // coverage:ignore-start
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -299,4 +305,6 @@ class _SideMenuSubTileState extends State<SideMenuSubTile> {
     properties.add(FlagProperty('hasSelectedLeading', value: tile.selectedLeading != null, ifTrue: 'has selectedLeading'));
     properties.add(FlagProperty('hasTrailing', value: tile.trailing != null, ifTrue: 'has trailing'));
   }
+
+  // coverage:ignore-end
 }

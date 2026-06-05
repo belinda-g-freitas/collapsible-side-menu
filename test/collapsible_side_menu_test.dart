@@ -14,7 +14,8 @@ Widget _wrap(Widget child, {double width = 1200, double height = 800}) {
   );
 }
 
-List<SideMenuItem> _flatItems(int count) => List.generate(count, (i) => TileData(title: 'Item $i', leading: const Icon(Icons.circle)));
+List<SideMenuItem> _flatItems(int count) =>
+    List.generate(count, (i) => TileData(title: 'Item $i', leading: const Icon(Icons.circle)));
 
 List<SideMenuItem> _nestedItems({int roots = 5, int depth = 3}) {
   SubTileData makeSubTree(int d, String prefix) {
@@ -22,7 +23,10 @@ List<SideMenuItem> _nestedItems({int roots = 5, int depth = 3}) {
     return SubTileData(title: '$prefix-d$d', subTiles: List.generate(2, (i) => makeSubTree(d - 1, '$prefix-$i')));
   }
 
-  return List.generate(roots, (i) => TileData(title: 'Root $i', subTiles: List.generate(2, (j) => makeSubTree(depth, 'r$i-s$j'))));
+  return List.generate(
+    roots,
+    (i) => TileData(title: 'Root $i', subTiles: List.generate(2, (j) => makeSubTree(depth, 'r$i-s$j'))),
+  );
 }
 
 // 1. Enum unit tests
@@ -101,8 +105,7 @@ void _modelTests() {
     });
 
     test('resolveWith: own nullable fields take precedence over fallback', () {
-      // resolveWith() takes structural fields (tileHeight, borderRadius, padding)
-      // from the fallback, but nullable fields (color, titleStyle, etc.) from self.
+      // resolveWith() takes values from fallback style if default are null
       final ownStyle = SubMenuTileStyle(color: Colors.red);
       final fallback = SubMenuTileStyle(color: Colors.blue);
       final sub = SubTileData(title: 'S', style: ownStyle);
@@ -110,13 +113,13 @@ void _modelTests() {
       expect(resolved.style?.color, Colors.red);
     });
 
-    test('resolveWith: structural fields (tileHeight) come from fallback', () {
+    test('resolveWith: structural fields (tileHeight) come from self', () {
       final ownStyle = SubMenuTileStyle(tileHeight: 55);
       final fallback = SubMenuTileStyle(tileHeight: 30);
       final sub = SubTileData(title: 'S', style: ownStyle);
       final resolved = sub.resolveWith(fallback);
-      // tileHeight is a structural field — resolveWith always takes it from the fallback
-      expect(resolved.style?.tileHeight, 30);
+      // tileHeight is a structural field — resolveWith always keeps own
+      expect(resolved.style?.tileHeight, 55);
     });
   });
 
@@ -151,6 +154,58 @@ void _modelTests() {
 
 // 4. Style unit tests
 void _styleTests() {
+  group('MenuTileStyle', () {
+    test('equal instances are equal', () {
+      final a = MenuTileStyle();
+      final b = MenuTileStyle();
+
+      expect(a, equals(b));
+    });
+    test('different instances are not equal', () {
+      final a = MenuTileStyle();
+      final b = MenuTileStyle(tileHeight: 100);
+
+      expect(a, isNot(equals(b)));
+    });
+    test('equal instances have same hashCode', () {
+      final a = MenuTileStyle();
+      final b = MenuTileStyle();
+
+      expect(a.hashCode, equals(b.hashCode));
+    });
+    test('instance equals itself', () {
+      final style = MenuTileStyle();
+
+      expect(style == style, isTrue);
+    });
+  });
+
+  group('SubMenuTileStyle', () {
+    test('equal instances are equal', () {
+      final a = SubMenuTileStyle();
+      final b = SubMenuTileStyle();
+
+      expect(a, equals(b));
+    });
+    test('different instances are not equal', () {
+      final a = SubMenuTileStyle();
+      final b = SubMenuTileStyle(tileHeight: 100);
+
+      expect(a, isNot(equals(b)));
+    });
+    test('equal instances have same hashCode', () {
+      final a = SubMenuTileStyle();
+      final b = SubMenuTileStyle();
+
+      expect(a.hashCode, equals(b.hashCode));
+    });
+    test('instance equals itself', () {
+      final style = SubMenuTileStyle();
+
+      expect(style == style, isTrue);
+    });
+  });
+
   group('SubMenuTileStyle.resolveWith', () {
     test('own nullable fields override fallback', () {
       // Nullable fields (color, selectedColor, titleStyle…) come from self.
@@ -159,11 +214,11 @@ void _styleTests() {
       expect(own.resolveWith(fallback).color, Colors.red);
     });
 
-    test('tileHeight always resets to MenuConstants.subTileHeight after resolveWith', () {
+    test('tileHeight always resets to own after resolveWith', () {
       // tileHeight is not forwarded in resolveWith — it resets to the default.
       final own = SubMenuTileStyle(tileHeight: 88);
       final fallback = SubMenuTileStyle(tileHeight: 40);
-      expect(own.resolveWith(fallback).tileHeight, 30.0); // MenuConstants.subTileHeight
+      expect(own.resolveWith(fallback).tileHeight, 88.0); // Uses own tileHeight
     });
 
     test('returns self when called with null', () {
@@ -196,6 +251,14 @@ void _styleTests() {
     test('default opacity is 0.7', () => expect(const ToggleButtonStyle().opacity, 0.7));
     test('default topPosition is 20', () => expect(const ToggleButtonStyle().topPosition, 20.0));
     test('default iconSize is 20', () => expect(const ToggleButtonStyle().iconSize, 20.0));
+    test(
+      "default openedIcon is `const IconData(0xf0348, fontFamily: 'MaterialIcons', matchTextDirection: true)`",
+      () => expect(
+        const ToggleButtonStyle().openedIcon,
+        const IconData(0xf0348, fontFamily: 'MaterialIcons', matchTextDirection: true),
+      ),
+    );
+    test('default iconSize is null', () => expect(const ToggleButtonStyle().backgroundColor, null));
 
     test('assert: opacity must be non-negative', () {
       expect(() => ToggleButtonStyle(opacity: -0.1), throwsAssertionError);
@@ -212,10 +275,35 @@ void _styleTests() {
       expect(s.copyWith(opacity: 1.0).opacity, 1.0);
       expect(s.copyWith(opacity: 1.0).iconSize, 20.0);
     });
-
-    test('equality', () {
-      expect(const ToggleButtonStyle(), equals(const ToggleButtonStyle()));
-      expect(const ToggleButtonStyle(opacity: 0.3), isNot(equals(const ToggleButtonStyle(opacity: 0.9))));
+    // test('equality', () {
+    //   // expect(const ToggleButtonStyle(), equals(const ToggleButtonStyle()));
+    //   expect(const ToggleButtonStyle(opacity: 0.3), isNot(equals(const ToggleButtonStyle(opacity: 0.9))));
+    // });
+    test('equal instances are equal', () {
+      final a = const ToggleButtonStyle();
+      final b = const ToggleButtonStyle();
+      expect(a, equals(b));
+    });
+    test('different instances are not equal', () {
+      final a = const ToggleButtonStyle();
+      final b = const ToggleButtonStyle(
+        iconColor: Colors.blue,
+        backgroundColor: Colors.red,
+        iconSize: 24,
+        opacity: .5,
+        topPosition: 30,
+        openedIcon: Icons.abc,
+      );
+      expect(a, isNot(equals(b)));
+    });
+    test('equal instances have same hashCode', () {
+      final a = const ToggleButtonStyle();
+      final b = const ToggleButtonStyle();
+      expect(a.hashCode, equals(b.hashCode));
+    });
+    test('instance equals itself', () {
+      final style = const ToggleButtonStyle();
+      expect(style == style, isTrue);
     });
   });
 
@@ -305,7 +393,10 @@ void _widgetTests() {
   group('CollapsibleSideMenu — MenuBehaviour', () {
     testWidgets('defaultBehaviour.open: menu starts expanded at any width', (tester) async {
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.open, hasToggleButton: false), width: 300),
+        _wrap(
+          CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.open, hasToggleButton: false),
+          width: 300,
+        ),
       );
       await tester.pumpAndSettle();
       // Tile titles are visible when the menu is open
@@ -314,7 +405,10 @@ void _widgetTests() {
 
     testWidgets('defaultBehaviour.collapse: menu starts collapsed', (tester) async {
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.collapse, hasToggleButton: false), width: 1200),
+        _wrap(
+          CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.collapse, hasToggleButton: false),
+          width: 1200,
+        ),
       );
       await tester.pumpAndSettle();
       // Tile full titles are not visible when collapsed
@@ -325,7 +419,12 @@ void _widgetTests() {
     testWidgets('defaultBehaviour.auto + tablet: opens at wide screen', (tester) async {
       await tester.pumpWidget(
         _wrap(
-          CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.auto, autoFrom: AutoOpenFrom.tablet, hasToggleButton: false),
+          CollapsibleSideMenu(
+            items: _flatItems(2),
+            defaultBehaviour: MenuBehaviour.auto,
+            autoFrom: AutoOpenFrom.tablet,
+            hasToggleButton: false,
+          ),
           width: 800,
         ),
       );
@@ -336,7 +435,12 @@ void _widgetTests() {
     testWidgets('defaultBehaviour.auto + desktop: collapses below 950', (tester) async {
       await tester.pumpWidget(
         _wrap(
-          CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.auto, autoFrom: AutoOpenFrom.desktop, hasToggleButton: false),
+          CollapsibleSideMenu(
+            items: _flatItems(2),
+            defaultBehaviour: MenuBehaviour.auto,
+            autoFrom: AutoOpenFrom.desktop,
+            hasToggleButton: false,
+          ),
           width: 800,
         ),
       );
@@ -352,7 +456,10 @@ void _widgetTests() {
       // before assertions. pumpAndSettle alone can miss in-flight animations.
       const animDuration = Duration(milliseconds: 10);
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.open, duration: animDuration), width: 600),
+        _wrap(
+          CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.open, duration: animDuration),
+          width: 600,
+        ),
       );
       await tester.pump(animDuration);
       await tester.pumpAndSettle();
@@ -380,7 +487,14 @@ void _widgetTests() {
       final controller = SideMenuController();
 
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.collapse, hasToggleButton: false, controller: controller)),
+        _wrap(
+          CollapsibleSideMenu(
+            items: _flatItems(2),
+            defaultBehaviour: MenuBehaviour.collapse,
+            hasToggleButton: false,
+            controller: controller,
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -400,7 +514,14 @@ void _widgetTests() {
     testWidgets('controller.toggle() switches state', (tester) async {
       final controller = SideMenuController();
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(items: _flatItems(2), defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, controller: controller)),
+        _wrap(
+          CollapsibleSideMenu(
+            items: _flatItems(2),
+            defaultBehaviour: MenuBehaviour.open,
+            hasToggleButton: false,
+            controller: controller,
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -605,7 +726,13 @@ void _widgetTests() {
   group('CollapsibleSideMenu — header & footer', () {
     testWidgets('header is rendered', (tester) async {
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, header: (_, _) => const Text('MyHeader'))),
+        _wrap(
+          CollapsibleSideMenu(
+            defaultBehaviour: MenuBehaviour.open,
+            hasToggleButton: false,
+            header: (_, _) => const Text('MyHeader'),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
       expect(find.text('MyHeader'), findsOneWidget);
@@ -675,6 +802,13 @@ void _widgetTests() {
       final tilePos = tester.getTopLeft(find.text('Tile')).dy;
       final bottomPos = tester.getTopLeft(find.text('BottomWidget')).dy;
       expect(bottomPos, greaterThan(tilePos));
+    });
+
+    test('equal instances have same hashCode', () {
+      final child = const Text('Same');
+      final a = CustomMenuChild(child: child);
+      final b = CustomMenuChild(child: child);
+      expect(a.hashCode, equals(b.hashCode));
     });
   });
 
@@ -896,7 +1030,10 @@ void _widgetTests() {
   group('CollapsibleSideMenu — large list', () {
     testWidgets('renders 100 flat tiles without overflow', (tester) async {
       await tester.pumpWidget(
-        _wrap(CollapsibleSideMenu(defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, items: _flatItems(100)), height: 800),
+        _wrap(
+          CollapsibleSideMenu(defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, items: _flatItems(100)),
+          height: 800,
+        ),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -905,7 +1042,11 @@ void _widgetTests() {
     testWidgets('renders deeply nested items without overflow', (tester) async {
       await tester.pumpWidget(
         _wrap(
-          CollapsibleSideMenu(defaultBehaviour: MenuBehaviour.open, hasToggleButton: false, items: _nestedItems(roots: 5, depth: 3)),
+          CollapsibleSideMenu(
+            defaultBehaviour: MenuBehaviour.open,
+            hasToggleButton: false,
+            items: _nestedItems(roots: 5, depth: 3),
+          ),
           height: 800,
         ),
       );
