@@ -1,7 +1,9 @@
-[![pub package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dev/packages/collapsible_side_menu)
+[![Flutter package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dev/packages/collapsible_side_menu)
 [![codecov](https://codecov.io/github/belinda-g-freitas/collapsible-side-menu/graph/badge.svg?token=9YM05H0TXO)](https://codecov.io/github/belinda-g-freitas/collapsible-side-menu)
-<a href="https://github.com/belinda-g-freitas/collapsible-side-menu/issues"><img src="https://img.shields.io/github/issues/belinda-g-freitas/collapsible-side-menu" alt="GitHub issues"></a>
-<img alt="GitHub contributors" src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible-side-menu?logo=github&labelColor=333940"></a>
+[![Pub Points](https://img.shields.io/pub/points/flutter_screenutil_plus)](https://pub.dev/packages/collapsible_side_menu/score)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/LICENSE)
+<!-- <a href="https://github.com/belinda-g-freitas/collapsible-side-menu/issues"><img src="https://img.shields.io/github/issues/belinda-g-freitas/collapsible-side-menu" alt="GitHub issues"></a> -->
+<!-- <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible-side-menu?logo=github&labelColor=333940"></a> -->
 
 # collapsible_side_menu
 
@@ -11,7 +13,7 @@
 | :-------------------------------------------------: | :--------------------------------------------------: | :------------------------------------------: |
 | ![Mobile](assets/collapsible_side_menu_android.gif) | ![Desktop](assets/collapsible_side_menu_desktop.gif) | ![Web](assets/collapsible_side_menu_web.png) |
 
-Full [mobile](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_android.mp4) and [desktop](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/assets/collapsible_side_menu_desktop.mp4) demo videos.
+Full [mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9-814edbdd310b) and [desktop](https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36) demo videos.
 
 ## Table of contents
 
@@ -22,6 +24,7 @@ Full [mobile](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/ma
     - [Installation](#installation)
     - [Import package](#import-package)
     - [Basic usage example](#basic-usage-example)
+  - [Essentials](#essentials)
     - [Elements, types, usage and description](#elements-types-usage-and-description)
     - [Class, parameters, types and defaults](#class-parameters-types-and-defaults)
   - [⚠️Warning](#️warning)
@@ -35,6 +38,8 @@ Full [mobile](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/ma
 - add tiles and and their sub-tiles
 - customize menu, tile and sub-tile look
 
+https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36
+
 ## Usage
 
 ### Installation
@@ -46,7 +51,7 @@ dependencies:
   flutter:
     sdk: flutter
   # add this line
-  collapsible_side_menu: ^latest_version
+  collapsible_side_menu: latest_version
 ```
 
 or run
@@ -184,6 +189,8 @@ CollapsibleSideMenu(
   },
 ),
 ```
+
+## Essentials
 
 ### Elements, types, usage and description
 
@@ -537,7 +544,6 @@ CollapsibleSideMenu(
     <td>double?</td>
     <td>null</td>
   </tr>
-
 
   <!-- ToggleButtonStyle -->
   <tr id="4">
