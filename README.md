@@ -1,6 +1,7 @@
 [![Flutter package](https://img.shields.io/pub/v/collapsible_side_menu.svg)](https://pub.dev/packages/collapsible_side_menu)
 [![codecov](https://codecov.io/github/belinda-g-freitas/collapsible-side-menu/graph/badge.svg?token=9YM05H0TXO)](https://codecov.io/github/belinda-g-freitas/collapsible-side-menu)
 [![Pub Points](https://img.shields.io/pub/points/flutter_screenutil_plus)](https://pub.dev/packages/collapsible_side_menu/score)
+[![Deploy demo website](https://github.com/belinda-g-freitas/collapsible-side-menu/actions/workflows/deploy-demo.yml/badge.svg)](https://github.com/belinda-g-freitas/collapsible-side-menu/actions/workflows/deploy-demo.yml)
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/LICENSE)
 
 <!-- <a href="https://github.com/belinda-g-freitas/collapsible-side-menu/issues"><img src="https://img.shields.io/github/issues/belinda-g-freitas/collapsible-side-menu" alt="GitHub issues"></a> -->
@@ -14,7 +15,7 @@
 | :-------------------------------------------------: | :--------------------------------------------------: | :------------------------------------------: |
 | ![Mobile](assets/collapsible_side_menu_android.gif) | ![Desktop](assets/collapsible_side_menu_desktop.gif) | ![Web](assets/collapsible_side_menu_web.png) |
 
-[Mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9-814edbdd310b) and [desktop](https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36) demo videos; or look here for live [demo](https://belinda-g-freitas.github.io/collapsible_side_menu/).
+[Mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9-814edbdd310b) and [desktop](https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36) demo videos; or look here for live [demo](https://belinda-g-freitas.github.io/collapsible-side-menu/).
 
 ## Table of contents
 
