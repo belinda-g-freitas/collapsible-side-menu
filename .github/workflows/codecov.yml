@@ -1,9 +1,8 @@
 name: Code Coverage
 
-# on: [ push, pull_request ]
 on:
   release:
-    types: [published] # triggers when you create a GitHub Release
+    types: [published]
 
 jobs:
   upload:

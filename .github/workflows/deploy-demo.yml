@@ -32,11 +32,13 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+        working-directory: example
 
       - name: Build web app
         run: |
           flutter build web --release \
           --base-href "/${{ github.event.repository.name }}/"
+        working-directory: example
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -44,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/web
+          path: example/build/web
 
       - name: Deploy to GitHub Pages
         id: deployment
