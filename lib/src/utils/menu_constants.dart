@@ -12,6 +12,7 @@ class MenuConstants {
   static const double horizontalSpacing = 3;
   static const double selectedBorderWidth = 0.5;
   static const double tilesVerticalSpacing = 2;
+  static const double headerHeight = 100;
 
   // Colors
   static const Color transparent = Color(0x00_000000);
@@ -25,7 +26,7 @@ class MenuConstants {
   static const EdgeInsetsGeometry menuOuterPadding = .all(4);
 
   // OTHERS
-  static const Duration duration = Duration(milliseconds: 250);
+  static const Duration duration = Duration(milliseconds: 450);
   static const BorderRadius borderRadius = .all(.circular(radius));
   static const Size selectedIndicatorSize = Size(4, 20);
   static const Widget emptyWidget = SizedBox.shrink();

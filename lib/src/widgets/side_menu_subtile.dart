@@ -26,8 +26,8 @@ class SideMenuSubTile extends StatefulWidget {
   final bool isMenuOpen;
   final List<int> selectedPath;
   final List<int> basePath;
-  final void Function(List<int> path) onSelectPath;
-  final void Function(List<int> path) onToggle;
+  final ValueChanged<List<int>> onSelectPath;
+  final ValueChanged<List<int>> onToggle;
   final ValueNotifier<Set<String>> openNodes;
 
   @override

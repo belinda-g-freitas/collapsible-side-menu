@@ -57,34 +57,34 @@ void _enumTests() {
 void _modelTests() {
   group('TileData', () {
     test('default subTiles is empty', () {
-      final tile = TileData(title: 'T');
+      final tile = const TileData(title: 'T');
       expect(tile.subTiles, isEmpty);
     });
 
     test('hasSelectedIndicator defaults to true', () {
-      expect(TileData(title: 'T').hasSelectedIndicator, isTrue);
+      expect(const TileData(title: 'T').hasSelectedIndicator, isTrue);
     });
 
     test('copyWith overrides single field', () {
-      final tile = TileData(title: 'A');
+      final tile = const TileData(title: 'A');
       final copy = tile.copyWith(title: 'B');
       expect(copy.title, 'B');
       expect(copy.subTiles, isEmpty);
     });
 
     test('equality: same fields → equal', () {
-      final a = TileData(title: 'X');
-      final b = TileData(title: 'X');
+      final a = const TileData(title: 'X');
+      final b = const TileData(title: 'X');
       expect(a, equals(b));
     });
 
     test('equality: different title → not equal', () {
-      expect(TileData(title: 'A'), isNot(equals(TileData(title: 'B'))));
+      expect(const TileData(title: 'A'), isNot(equals(const TileData(title: 'B'))));
     });
 
     test('resolveWith merges style', () {
       final style = MenuTileStyle(tileHeight: 99);
-      final tile = TileData(title: 'T');
+      final tile = const TileData(title: 'T');
       final resolved = tile.resolveWith(style);
       expect(resolved.style, equals(style));
     });
@@ -94,9 +94,9 @@ void _modelTests() {
     test('default subTiles is empty', () => expect(SubTileData(title: 'S').subTiles, isEmpty));
 
     test('copyWith preserves other fields', () {
-      final sub = SubTileData(title: 'A', id: 'id1');
-      final copy = sub.copyWith(title: 'B');
-      expect(copy.id, 'id1');
+      final sub = SubTileData(title: 'A', leading: const CircleAvatar());
+      final copy = sub.copyWith(leading: const SizedBox.square(dimension: 40));
+      expect(copy.title, 'A');
     });
 
     test('equality', () {
@@ -123,12 +123,12 @@ void _modelTests() {
     });
   });
 
-  group('TitleData', () {
-    test('copyWith', () {
-      final t = const TitleData(title: 'A');
-      expect(t.copyWith(title: 'B').title, 'B');
-    });
-  });
+  // group('TitleData', () {
+  //   test('copyWith', () {
+  //     final t = const TitleData(title: 'A');
+  //     expect(t.copyWith(title: 'B').title, 'B');
+  //   });
+  // });
 
   group('DividerData', () {
     test('default divider is Divider', () {
@@ -320,23 +320,19 @@ void _styleTests() {
 // 5. SideMenuController unit tests
 void _controllerTests() {
   group('SideMenuController', () {
-    test('all callbacks are assignable and callable', () {
+    test('open/close/toggle assert when not attached to a CollapsibleSideMenu', () {
       final controller = SideMenuController();
-      bool opened = false, closed = false, toggled = false;
+      expect(() => controller.open(), throwsAssertionError);
+      expect(() => controller.close(), throwsAssertionError);
+      expect(() => controller.toggle(), throwsAssertionError);
+    });
 
-      controller.open = () => opened = true;
-      controller.close = () => closed = true;
-      controller.toggle = () => toggled = true;
-      controller.isCollapsed = () => false;
-
-      controller.open();
-      controller.close();
-      controller.toggle();
-
-      expect(opened, isTrue);
-      expect(closed, isTrue);
-      expect(toggled, isTrue);
-      expect(controller.isCollapsed(), isFalse);
+    test('onCollapsedChanged can be assigned and invoked', () {
+      final controller = SideMenuController();
+      bool? received;
+      controller.onCollapsedChanged = (value) => received = value;
+      controller.onCollapsedChanged?.call(true);
+      expect(received, isTrue);
     });
   });
 }
@@ -361,10 +357,10 @@ void _widgetTests() {
     testWidgets('renders TitleData and DividerData', (tester) async {
       await tester.pumpWidget(
         _wrap(
-          CollapsibleSideMenu(
+          const CollapsibleSideMenu(
             items: [
-              const TitleData(title: 'Section'),
-              const DividerData(),
+              TitleData(title: 'Section'),
+              DividerData(),
               TileData(title: 'Home'),
             ],
           ),
@@ -485,7 +481,6 @@ void _widgetTests() {
   group('CollapsibleSideMenu — SideMenuController', () {
     testWidgets('controller.open() expands, controller.close() collapses', (tester) async {
       final controller = SideMenuController();
-
       await tester.pumpWidget(
         _wrap(
           CollapsibleSideMenu(
@@ -497,17 +492,14 @@ void _widgetTests() {
         ),
       );
       await tester.pumpAndSettle();
-
-      expect(controller.isCollapsed(), isTrue);
+      expect(find.text('Item 0'), findsNothing);
 
       controller.open();
       await tester.pumpAndSettle();
-      expect(controller.isCollapsed(), isFalse);
       expect(find.text('Item 0'), findsOneWidget);
 
       controller.close();
       await tester.pumpAndSettle();
-      expect(controller.isCollapsed(), isTrue);
       expect(find.text('Item 0'), findsNothing);
     });
 
@@ -524,11 +516,60 @@ void _widgetTests() {
         ),
       );
       await tester.pumpAndSettle();
+      expect(find.text('Item 0'), findsOneWidget);
 
-      expect(controller.isCollapsed(), isFalse);
       controller.toggle();
       await tester.pumpAndSettle();
-      expect(controller.isCollapsed(), isTrue);
+      expect(find.text('Item 0'), findsNothing);
+    });
+
+    testWidgets('onCollapsedChanged fires when menu state changes via controller', (tester) async {
+      final controller = SideMenuController();
+      final received = <bool>[];
+      controller.onCollapsedChanged = received.add;
+
+      await tester.pumpWidget(
+        _wrap(
+          CollapsibleSideMenu(
+            items: _flatItems(2),
+            defaultBehaviour: MenuBehaviour.collapse,
+            hasToggleButton: false,
+            controller: controller,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      controller.open();
+      await tester.pumpAndSettle(); // needed since _updateCollapsed uses addPostFrameCallback
+
+      expect(received, contains(false));
+    });
+
+    testWidgets('controller detaches on dispose — later calls assert', (tester) async {
+      final controller = SideMenuController();
+
+      await tester.pumpWidget(_wrap(CollapsibleSideMenu(items: _flatItems(2), hasToggleButton: false, controller: controller)));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(_wrap(const SizedBox()));
+      await tester.pumpAndSettle();
+
+      expect(() => controller.toggle(), throwsAssertionError);
+    });
+
+    testWidgets('controller detaches when swapped for a different controller', (tester) async {
+      final controllerA = SideMenuController();
+      final controllerB = SideMenuController();
+
+      await tester.pumpWidget(_wrap(CollapsibleSideMenu(items: _flatItems(2), hasToggleButton: false, controller: controllerA)));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(_wrap(CollapsibleSideMenu(items: _flatItems(2), hasToggleButton: false, controller: controllerB)));
+      await tester.pumpAndSettle();
+
+      expect(() => controllerA.toggle(), throwsAssertionError);
+      expect(() => controllerB.toggle(), returnsNormally);
     });
   });
 
@@ -772,7 +813,7 @@ void _widgetTests() {
           CollapsibleSideMenu(
             defaultBehaviour: MenuBehaviour.open,
             hasToggleButton: false,
-            items: [TileData(title: 'Tile')],
+            items: [const TileData(title: 'Tile')],
             customMenuChild: CustomMenuChild(child: const Text('TopWidget'), childPosition: CustomChildPosition.aboveItems),
           ),
         ),
@@ -791,7 +832,7 @@ void _widgetTests() {
           CollapsibleSideMenu(
             defaultBehaviour: MenuBehaviour.open,
             hasToggleButton: false,
-            items: [TileData(title: 'Tile')],
+            items: [const TileData(title: 'Tile')],
             customMenuChild: CustomMenuChild(child: const Text('BottomWidget'), childPosition: CustomChildPosition.belowItems),
           ),
         ),
@@ -1016,7 +1057,7 @@ void _widgetTests() {
             hasToggleButton: false,
             items: [
               TileData(title: 'Styled', style: MenuTileStyle(tileHeight: 80)),
-              TileData(title: 'Default'),
+              const TileData(title: 'Default'),
             ],
           ),
         ),

@@ -7,13 +7,13 @@ import 'enums/auto_open_from.dart';
 import 'enums/menu_behaviour.dart';
 import 'models/data/custom_menu_child.dart';
 import 'models/data/side_menu_item.dart';
-import 'models/side_menu_controller.dart';
 import 'models/styles/menu_tile_style.dart';
 import 'models/styles/side_menu_style.dart';
 import 'models/styles/sub_menu_tile_style.dart';
 import 'models/styles/toggle_button_style.dart';
 import 'side_menu_state_mixin.dart';
 import 'utils/menu_constants.dart';
+import 'utils/types.dart';
 import 'widgets/colored_content.dart';
 import 'widgets/side_menu_divider.dart';
 import 'widgets/side_menu_tile.dart';
@@ -26,6 +26,60 @@ import 'widgets/toggle_button.dart';
 /// in case you want to adapt the header or footer but also don't want to use a [controller]
 typedef MenuHeaderBuilder = Widget Function(BuildContext context, bool isOpen);
 
+/// Menu controller
+class SideMenuController {
+  VoidCallback? _open;
+  VoidCallback? _close;
+  VoidCallback? _toggle;
+  bool _isAttached = false;
+
+  /// Action to open menu
+  void open() {
+    assert(_isAttached, _notAttachedMessage('open'));
+    _open?.call();
+  }
+
+  /// Action to collapse menu
+  void close() {
+    assert(_isAttached, _notAttachedMessage('close'));
+    _close?.call();
+  }
+
+  /// Action to toggle menu
+  void toggle() {
+    assert(_isAttached, _notAttachedMessage('toggle'));
+    _toggle?.call();
+  }
+
+  /// Notified every time menu state updates
+  ValueChanged<bool>? onCollapsedChanged;
+
+  /// Called internally by [CollapsibleSideMenu], not meant for public use.
+  @protected
+  void attach({required VoidCallback open, required VoidCallback close, required VoidCallback toggle}) {
+    _open = open;
+    _close = close;
+    _toggle = toggle;
+    _isAttached = true;
+  }
+
+  /// Called internally whenever the menu's open/collapsed state changes.
+  void _updateCollapsed(bool isCollapsed) =>
+      WidgetsBinding.instance.addPostFrameCallback((_) => onCollapsedChanged?.call(isCollapsed));
+
+  String _notAttachedMessage(String method) =>
+      'SideMenuController.$method() was called, but this controller is not attached to a CollapsibleSideMenu. '
+      'Make sure you pass it via CollapsibleSideMenu(controller: yourController).';
+
+  void _detach() {
+    _open = null;
+    _close = null;
+    _toggle = null;
+    _isAttached = false;
+  }
+}
+
+/// Menu tiles selection state
 @immutable
 class _SelectionState {
   const _SelectionState({this.index, this.path = const []});
@@ -47,7 +101,7 @@ class _SelectionState {
   int get hashCode => Object.hash(index, Object.hashAll(path));
 }
 
-//
+/// Collapsible side menu
 class CollapsibleSideMenu extends StatefulWidget {
   const CollapsibleSideMenu({
     super.key,
@@ -135,11 +189,22 @@ class CollapsibleSideMenu extends StatefulWidget {
   /// The default selected index if [items] is not empty and [items.length] > [defaultIndex]
   final int? defaultIndex;
 
+  static CollapsibleSideMenuState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<CollapsibleSideMenuState>();
+  }
+
+  static CollapsibleSideMenuState of(BuildContext context) {
+    final state = maybeOf(context);
+    assert(state != null, 'No CollapsibleSideMenu found in context.');
+
+    return state!;
+  }
+
   @override
-  State<CollapsibleSideMenu> createState() => _CollapsibleSideMenuState();
+  State<CollapsibleSideMenu> createState() => CollapsibleSideMenuState();
 }
 
-class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenuStateMixin {
+class CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenuStateMixin {
   late MenuTileStyle _defaultStyle;
   late SideMenuStyle _menuStyle;
   late Color _backgroundColor, _unselectedColor;
@@ -154,7 +219,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   bool _isWidthInitialized = false, _derivedValuesInitialized = false;
 
   //
-  void onSelect(int rootIndex, List<int> path) {
+  void _onSelect(int rootIndex, List<int> path) {
     _selection.value = _SelectionState(index: rootIndex, path: path);
     widget.onIndexChanged?.call(rootIndex);
   }
@@ -169,18 +234,22 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
 
   void _openMenu() {
     if (!_isMenuOpen) setState(() => _isMenuOpen = true);
+    widget.controller?._updateCollapsed(false);
   }
 
   void _closeMenu() {
     if (_isMenuOpen) setState(() => _isMenuOpen = false);
+    widget.controller?._updateCollapsed(true);
   }
 
   void _toggleMenu() {
     setState(() => _isMenuOpen = !_isMenuOpen);
+    widget.controller?._updateCollapsed(!_isMenuOpen);
   }
 
   void _getMenuState(double width) {
     _isMenuOpen = openMenuState(behaviour: widget.defaultBehaviour, from: widget.autoFrom, deviceWidth: width);
+    widget.controller?._updateCollapsed(!_isMenuOpen);
   }
 
   void _setMenuState(double width) {
@@ -197,10 +266,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   }
 
   void _attachController(SideMenuController controller) {
-    controller.open = _openMenu;
-    controller.close = _closeMenu;
-    controller.toggle = _toggleMenu;
-    controller.isCollapsed = () => !_isMenuOpen;
+    controller.attach(open: _openMenu, close: _closeMenu, toggle: _toggleMenu);
   }
 
   void _recomputeDerivedValues() {
@@ -271,10 +337,10 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
 
     switch (tile) {
       case (TitleData _):
-        return SideMenuTitle(data: tile, color: _unselectedColor);
+        return SideMenuTitle(key: ValueKey('title_$currentIndex'), data: tile, color: _unselectedColor);
 
       case (DividerData _):
-        return SideMenuDivider(data: tile);
+        return SideMenuDivider(key: ValueKey('divider_$currentIndex'), data: tile);
 
       case (TileData _):
         final MenuTileStyle defaultStyle = _menuStyle.defaultTileStyle?.resolveWith(_defaultStyle) ?? _defaultStyle;
@@ -282,7 +348,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
 
         return RepaintBoundary(
           child: SideMenuTile(
-            key: ValueKey(tile.id ?? 'tile_$currentIndex'),
+            key: ValueKey('tile_$currentIndex'),
             horizontalOffset: _menuStyle.padding.horizontal / 2,
             isMenuOpen: isOpen,
             isSelected: isSelected,
@@ -291,7 +357,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
             // path handling
             basePath: [currentIndex],
             selectedPath: isSelected ? path : [],
-            onSelectPath: (path) => onSelect(currentIndex, path),
+            onSelectPath: (path) => _onSelect(currentIndex, path),
             onToggle: _toggleNode,
             openNodes: _openNodes,
           ),
@@ -305,6 +371,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
   Widget _body(bool isOpen) {
     final CustomMenuChild? customChild = widget.customMenuChild;
     final Color color = _unselectedColor;
+
     final List<Widget> customMenuChild = [
       if (customChild != null)
         Expanded(
@@ -316,11 +383,12 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
 
     return Column(
       mainAxisSize: .max,
+      crossAxisAlignment: .start,
       children: [
         // header
         if (widget.header != null)
           RepaintBoundary(
-            child: ColoredContent(key: const Key('header'), color: color, child: widget.header?.call(context, isOpen)),
+            child: ColoredContent(key: const Key('header'), color: color, child: widget.header!.call(context, isOpen)),
           ),
 
         // custom child above items
@@ -357,9 +425,9 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
         if (customChild?.childPosition == .belowItems) ...customMenuChild,
 
         // footer
-        if (widget.header != null)
+        if (widget.footer != null)
           RepaintBoundary(
-            child: ColoredContent(key: const Key('footer'), color: color, child: widget.footer?.call(context, isOpen)),
+            child: ColoredContent(key: const Key('footer'), color: color, child: widget.footer!.call(context, isOpen)),
           ),
       ],
     );
@@ -382,17 +450,17 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     return replacement;
   }
 
-  //
+  @protected
   @override
   void initState() {
     super.initState();
 
     _menuStyle = widget.menuStyle ?? SideMenuStyle();
     _selection = ValueNotifier(_SelectionState(index: widget.defaultIndex));
-    if (widget.controller != null) _attachController(widget.controller!);
     _items = widget.items;
   }
 
+  @protected
   @override
   void didChangeDependencies() {
     _recomputeDerivedValues();
@@ -400,7 +468,10 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     final width = MediaQuery.widthOf(context);
     if (!_isWidthInitialized) {
       _isWidthInitialized = true;
+      // init menu  state (opened / collapsed)
       _setMenuState(width);
+      // attach controller
+      if (widget.controller != null) _attachController(widget.controller!);
     }
     //
     if (_lastWidth != width) {
@@ -417,6 +488,7 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     super.didChangeDependencies();
   }
 
+  @protected
   @override
   void didUpdateWidget(covariant CollapsibleSideMenu oldWidget) {
     final width = MediaQuery.widthOf(context);
@@ -429,17 +501,22 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
       if (oldWidget.menuStyle?.boxShadow != widget.menuStyle?.boxShadow) _setDecoration();
     }
     // set controller
-    if (oldWidget.controller != widget.controller && widget.controller != null) _attachController(widget.controller!);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?._detach(); // detach old, whether swapped or removed
+      if (widget.controller != null) _attachController(widget.controller!);
+    }
     // set default values
     if (oldWidget.menuStyle != widget.menuStyle) _recomputeDerivedValues();
     //
-    if (oldWidget.items != widget.items) _items = widget.items;
+    if (!listEquals(oldWidget.items, widget.items)) _items = widget.items;
 
     super.didUpdateWidget(oldWidget);
   }
 
+  @protected
   @override
   Widget build(BuildContext context) {
+    assert(debugCheckHasMaterial(context));
     assert(
       widget.defaultIndex == null || (widget.defaultIndex! < _items.length),
       'defaultIndex (${widget.defaultIndex}) is out of range for items.length (${_items.length})',
@@ -451,8 +528,10 @@ class _CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenu
     return child;
   }
 
+  @protected
   @override
   void dispose() {
+    widget.controller?._detach();
     _selection.dispose();
     _openNodes.dispose();
     _resizeDebounce?.cancel();

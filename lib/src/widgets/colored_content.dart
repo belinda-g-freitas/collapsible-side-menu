@@ -18,6 +18,7 @@ class ColoredContent extends StatelessWidget {
       child: IconTheme.merge(
         data: IconThemeData(color: color),
         child: child!,
+        // ListTileTheme.merge(textColor: color, iconColor: color, child: child!),
       ),
     );
   }

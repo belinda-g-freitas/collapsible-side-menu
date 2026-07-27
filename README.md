@@ -2,6 +2,7 @@
 [![codecov](https://codecov.io/github/belinda-g-freitas/collapsible-side-menu/graph/badge.svg?token=9YM05H0TXO)](https://codecov.io/github/belinda-g-freitas/collapsible-side-menu)
 [![Pub Points](https://img.shields.io/pub/points/flutter_screenutil_plus)](https://pub.dev/packages/collapsible_side_menu/score)
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/belinda-g-freitas/collapsible-side-menu/blob/master/LICENSE)
+
 <!-- <a href="https://github.com/belinda-g-freitas/collapsible-side-menu/issues"><img src="https://img.shields.io/github/issues/belinda-g-freitas/collapsible-side-menu" alt="GitHub issues"></a> -->
 <!-- <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/belinda-g-freitas/collapsible-side-menu?logo=github&labelColor=333940"></a> -->
 
@@ -13,7 +14,7 @@
 | :-------------------------------------------------: | :--------------------------------------------------: | :------------------------------------------: |
 | ![Mobile](assets/collapsible_side_menu_android.gif) | ![Desktop](assets/collapsible_side_menu_desktop.gif) | ![Web](assets/collapsible_side_menu_web.png) |
 
-Full [mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9-814edbdd310b) and [desktop](https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36) demo videos.
+[Mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9-814edbdd310b) and [desktop](https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36) demo videos; or look here for live [demo](https://belinda-g-freitas.github.io/collapsible_side_menu/).
 
 ## Table of contents
 
@@ -24,10 +25,11 @@ Full [mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9
     - [Installation](#installation)
     - [Import package](#import-package)
     - [Basic usage example](#basic-usage-example)
+    - [🚩 BREAKING CHANGES from 1.x.x to 2.x.x](#-breaking-changes-from-1xx-to-2xx)
   - [Essentials](#essentials)
     - [Elements, types, usage and description](#elements-types-usage-and-description)
     - [Class, parameters, types and defaults](#class-parameters-types-and-defaults)
-  - [⚠️Warning](#️warning)
+  - [⚠️ Notice](#️-notice)
 
 ## Features
 
@@ -37,6 +39,7 @@ Full [mobile](https://github.com/user-attachments/assets/50e1ac4b-c0af-46d2-b5c9
 - set toggle button and it's look
 - add tiles and and their sub-tiles
 - customize menu, tile and sub-tile look
+- adaptive header widget (addon)
 
 https://github.com/user-attachments/assets/964fe34e-0e02-425f-96d1-25a96e559a36
 
@@ -164,6 +167,7 @@ CollapsibleSideMenu(
       title: 'Conversations',
       leading: const Icon(Icons.chat_bubble_outline, size: 18),
       selectedLeading: const Icon(Icons.chat_bubble, size: 18),
+      /// use whatever badge package ou UI you want by wrapping tile with it
       badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: Offset(menutextDirection == .rtl ? 2 : -2, -4), child: tile),
     ),
     TileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
@@ -190,6 +194,22 @@ CollapsibleSideMenu(
 ),
 ```
 
+### 🚩 BREAKING CHANGES from 1.x.x to 2.x.x
+
+| NEW                                     |         Type         |                                                    Description |
+| :-------------------------------------- | :------------------: | -------------------------------------------------------------: |
+| SideMenuHeader                          |        Widget        | Menu header widget. Auto adapts to menu state changes (Addon). |
+| SideMenuController().onCollapsedChanged | void Function(bool)  |                                                                |
+| CollapsibleSideMenu().of(context)       | CollapsibleSideMenu  |         To access CollapsibleSideMenu members from descendants |
+| CollapsibleSideMenu().maybeOf(context)  | CollapsibleSideMenu? |         To access CollapsibleSideMenu members from descendants |
+| TileData().tooltip                      |       String?        |             To override default tooltip when menu is collapsed |
+
+| REMOVED                          |          Type |
+| :------------------------------- | ------------: |
+| SideMenuController().isCollapsed | bool Function |
+| TileData().id                    |       String? |
+| SubTileData().id                 |       String? |
+
 ## Essentials
 
 ### Elements, types, usage and description
@@ -215,6 +235,7 @@ CollapsibleSideMenu(
 ### Class, parameters, types and defaults
 
 <table>
+
   <!-- header -->
   <tr>
     <th>Class</th>
@@ -582,6 +603,6 @@ CollapsibleSideMenu(
 
 <br>
 
-## ⚠️Warning
+## ⚠️ Notice
 
 This package was only tested on Android, Linux and web so feedback is needed for other platforms.

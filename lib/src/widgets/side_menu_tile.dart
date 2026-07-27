@@ -32,8 +32,8 @@ class SideMenuTile extends StatefulWidget {
   final Color anchorBackgroundColor;
   final List<int> selectedPath;
   final List<int> basePath;
-  final void Function(List<int> path) onSelectPath;
-  final void Function(List<int> path) onToggle;
+  final ValueChanged<List<int>> onSelectPath;
+  final ValueChanged<List<int>> onToggle;
   final ValueNotifier<Set<String>> openNodes;
 
   @override
@@ -325,16 +325,33 @@ class _SideMenuTileState extends State<SideMenuTile> {
         : _style.color ?? _style.titleStyle?.color ?? Colors.white;
   }
 
+  /// set [TileData.initiallyExpanded] is tile has children
+  // void _seedInitiallyExpanded() {
+  //   if (_hasSubtiles) {
+  //     if (widget.tile.initiallyExpanded && !widget.openNodes.value.contains(_nodeKeyString)) {
+  //       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //         if (!mounted) return;
+  //         final updated = Set<String>.from(widget.openNodes.value)..add(_nodeKeyString);
+  //         widget.openNodes.value = updated;
+  //       });
+  //     }
+  //   }
+  // }
+
   @override
   void initState() {
     super.initState();
 
     _nodeKey = widget.basePath;
     _nodeKeyString = _nodeKey.join('-');
+    //
     tile = widget.tile;
     subTiles = tile.subTiles;
     _hasSubtiles = subTiles.isNotEmpty;
     _updateStyle(); // important it comes after tile and subtiles
+
+    // Seed initial expansion once; afterwards openNodes is the sole source of truth.
+    // _seedInitiallyExpanded();
   }
 
   @override
@@ -357,6 +374,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
       tile = widget.tile;
       subTiles = tile.subTiles;
       _hasSubtiles = subTiles.isNotEmpty;
+      // _seedInitiallyExpanded(); // new: re-seed since this is effectively a "new" tile at this slot
     } else if (!listEquals(oldWidget.tile.subTiles, widget.tile.subTiles)) {
       subTiles = tile.subTiles;
       _hasSubtiles = subTiles.isNotEmpty;
@@ -380,7 +398,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
     final Widget viewWithTooltip = widget.isMenuOpen
         ? view // skip tooltip construction entirely
         : Tooltip(
-            message: tile.title,
+            message: tile.tooltip ?? tile.title,
             enableTapToDismiss: false,
             textStyle: TextStyle(color: colorScheme.onSurface, fontWeight: .w400),
             decoration: BoxDecoration(
@@ -392,7 +410,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
               final double width = position.targetSize.width / 2 + widget.horizontalOffset, dx = position.target.dx;
 
               return Offset(
-                Utils.isRTL(context) ? dx - (position.tooltipSize.width + width) : dx + width,
+                Directionality.of(context) == .rtl ? dx - (position.tooltipSize.width + width) : dx + width,
                 position.target.dy - position.tooltipSize.height / 2,
               );
             },
@@ -403,6 +421,7 @@ class _SideMenuTileState extends State<SideMenuTile> {
       onTap: () {
         tile.onTap?.call();
 
+        // toggle opened or selected states
         if (_hasSubtiles) {
           widget.onToggle(_nodeKey);
         } else {

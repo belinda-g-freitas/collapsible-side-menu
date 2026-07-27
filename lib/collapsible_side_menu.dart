@@ -1,7 +1,6 @@
-export 'src/collapsible_side_menu.dart' show CollapsibleSideMenu, MenuHeaderBuilder;
+export 'src/collapsible_side_menu.dart' show CollapsibleSideMenu, SideMenuController, MenuHeaderBuilder;
 
 // data
-export 'src/models/side_menu_controller.dart' show SideMenuController;
 export 'src/models/data/side_menu_item.dart' show SideMenuItem, TitleData, TileData, SubTileData, DividerData, TileBadgeBuilder;
 export 'src/models/data/custom_menu_child.dart' show CustomMenuChild;
 
@@ -15,3 +14,6 @@ export 'src/models/styles/toggle_button_style.dart' show ToggleButtonStyle;
 export 'src/enums/custom_child_position.dart' show CustomChildPosition;
 export 'src/enums/menu_behaviour.dart' show MenuBehaviour;
 export 'src/enums/auto_open_from.dart' show AutoOpenFrom;
+
+// addons
+export 'src/widgets/addons/side_menu_header.dart' show SideMenuHeader;

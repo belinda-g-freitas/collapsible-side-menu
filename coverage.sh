@@ -7,4 +7,4 @@ flutter test --coverage
 genhtml -o coverage coverage/lcov.info 
 
 # Open to see coverage info
-open coverage/index.html
+xdg-open coverage/index.html

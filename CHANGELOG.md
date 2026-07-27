@@ -51,12 +51,20 @@ Set :
 
 ## 1.0.1
   
-  - Fix some directionality issues
-  - Add Codecov
+  - Fixed some directionality issues
+  - Added Codecov
   
 ## 1.0.2
-  - Fix toggle button rotation
+  - Fixed toggle button rotation
 
 ## 1.0.3
   - Fixes and optimizations
   - Updated tests
+
+## 2.0.0
+  - Fixed late initialization errors on `SideMenuController` members
+  - Added a header widget which automatically adapts to menu state changes (opened/collapsed)
+  - Updated the example project
+  - Added a live demo
+  - Updated README
+  - Some other updates (refer to README)

@@ -3,6 +3,7 @@ import '../models/data/side_menu_item.dart';
 
 class SideMenuDivider extends StatelessWidget {
   const SideMenuDivider({super.key, required this.data});
+  
   final DividerData data;
 
   @override

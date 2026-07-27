@@ -1,9 +1,21 @@
-import 'package:collapsible_side_menu/collapsible_side_menu.dart';
+import 'dart:developer' show log;
+
 import 'package:flutter/material.dart';
 
+import 'package:collapsible_side_menu/collapsible_side_menu.dart';
+
 final themeModeNotifier = ValueNotifier<ThemeMode>(.system);
-const Color appColor = Color(0xFF_292CFF);
-const RoundedRectangleBorder roundedBorder = .new(borderRadius: .all(.circular(10)));
+final appColorNotifier = ValueNotifier<Color>(const Color(0xFF_292CFF));
+const appColors = [
+  Color(0xFF_F43F5E),
+  Color(0xFF_9333EA),
+  Color(0xFF_F2A900),
+  Color(0xFF_2196F3),
+  Color(0xFF_292CFF),
+  Color(0xFF_0D9488),
+];
+const borderRadius = BorderRadius.all(.circular(10));
+const RoundedRectangleBorder roundedBorder = .new(borderRadius: borderRadius);
 
 void main() {
   runApp(const MainApp());
@@ -12,9 +24,9 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
-  ThemeData _themeData({required Brightness brightness, required Color scaffoldBackgroundColor}) {
+  ThemeData _themeData({required Color color, Brightness brightness = .light, required Color scaffoldBackgroundColor}) {
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: appColor, brightness: brightness),
+      colorScheme: ColorScheme.fromSeed(seedColor: color, brightness: brightness),
       brightness: brightness,
       scaffoldBackgroundColor: scaffoldBackgroundColor,
       menuTheme: MenuThemeData(
@@ -34,15 +46,19 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
-      builder: (_, mode, __) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Collapsible Side Menu Example',
-          color: appColor,
-          themeMode: mode,
-          theme: _themeData(brightness: .light, scaffoldBackgroundColor: const Color(0xff_f3f3f9)),
-          darkTheme: _themeData(brightness: .dark, scaffoldBackgroundColor: const Color(0xff_1a1d21)),
-          home: MediaQuery.withNoTextScaling(child: const ExampleScreen()),
+      builder: (_, mode, _) {
+        return ValueListenableBuilder(
+          valueListenable: appColorNotifier,
+          builder: (_, appColor, _) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Collapsible Menu Example',
+              themeMode: mode,
+              theme: _themeData(color: appColor, scaffoldBackgroundColor: const Color(0xff_f3f3f9)),
+              darkTheme: _themeData(color: appColor, brightness: .dark, scaffoldBackgroundColor: const Color(0xff_1a1d21)),
+              home: MediaQuery.withNoTextScaling(child: const ExampleScreen()),
+            );
+          },
         );
       },
     );
@@ -58,7 +74,20 @@ class ExampleScreen extends StatefulWidget {
 }
 
 class _ExampleScreenState extends State<ExampleScreen> {
-  final _controller = SideMenuController();
+  late final SideMenuController _controller;
+  bool? _isCollapsed;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = SideMenuController()
+      ..onCollapsedChanged = (isCollapsed) {
+        log('Menu is now ${isCollapsed ? "collapsed" : "open"}');
+
+        setState(() => _isCollapsed = isCollapsed);
+      };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,37 +99,36 @@ class _ExampleScreenState extends State<ExampleScreen> {
           CollapsibleSideMenu(
             defaultIndex: 3,
             defaultBehaviour: .open,
-            menuStyle: SideMenuStyle(textDirection: .rtl),
+            menuStyle: SideMenuStyle(textDirection: .ltr),
             toggleButtonStyle: const ToggleButtonStyle(topPosition: 55, iconSize: 16),
             header: (_, isOpen) {
               return Column(
                 crossAxisAlignment: .start,
                 children: [
-                  Row(
-                    spacing: 10,
-                    mainAxisSize: .min,
-                    children: [
-                      const Flexible(child: CircleAvatar(radius: 22, child: FlutterLogo())),
-                      if (isOpen)
-                        const Flexible(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: .start,
-                            children: [
-                              Text(
-                                'Joanna Doe',
-                                overflow: .ellipsis,
-                                style: TextStyle(fontWeight: .w500, fontSize: 14.5),
-                              ),
-                              Text(
-                                'joanna.doe.404@flutter.dev',
-                                overflow: .ellipsis,
-                                style: TextStyle(fontSize: 12, fontWeight: .w300),
-                              ),
-                            ],
-                          ),
+                  SideMenuHeader(
+                    isOpen: isOpen,
+                    leading: const CircleAvatar(radius: 22, child: FlutterLogo()),
+                    decoration: BoxDecoration(
+                      color: Colors.cyan,
+                      borderRadius: borderRadius,
+                      border: Border.all(color: Colors.white, width: .5),
+                    ),
+                    trailing: const CircleAvatar(radius: 16),
+                    child: const Column(
+                      crossAxisAlignment: .start,
+                      children: [
+                        Text(
+                          'Joanna Doe',
+                          overflow: .ellipsis,
+                          style: TextStyle(fontWeight: .w500, fontSize: 15),
                         ),
-                    ],
+                        Text(
+                          'joanna.doe.404@flutter.dev',
+                          overflow: .ellipsis,
+                          style: TextStyle(fontSize: 12, fontWeight: .w300),
+                        ),
+                      ],
+                    ),
                   ),
                   const Divider(thickness: .5),
                 ],
@@ -116,6 +144,26 @@ class _ExampleScreenState extends State<ExampleScreen> {
                 ],
               );
             },
+            customMenuChild: CustomMenuChild(
+              childFlex: 0,
+              childPosition: .belowItems,
+              child: Builder(
+                builder: (ctx) {
+                  return GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(borderRadius: borderRadius, border: Border.all(width: .5)),
+                      padding: const EdgeInsets.all(10),
+                      child: const Text('This is a LTR menu', overflow: .ellipsis),
+                    ),
+                    onTap: () => ScaffoldMessenger.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(content: Text('Menu width is: ${CollapsibleSideMenu.maybeOf(ctx)?.widget.maxWidth}')),
+                      ),
+                  );
+                },
+              ),
+            ),
             items: [
               TileData(
                 title: 'User management',
@@ -152,34 +200,32 @@ class _ExampleScreenState extends State<ExampleScreen> {
               //
               const DividerData(),
               const TitleData(title: 'OTHERS'),
-              TileData(onTap: () {}, title: 'Vehicle', leading: const Icon(Icons.car_rental, size: 18)),
+              const TileData(title: 'Vehicle', leading: Icon(Icons.car_rental, size: 18)),
               TileData(
                 onTap: () {},
                 title: 'Conversations',
                 leading: const Icon(Icons.chat_bubble_outline, size: 18),
                 selectedLeading: const Icon(Icons.chat_bubble, size: 18),
-                badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: const Offset(-2, -4)),
+                // use whatever badge package ou UI you want by wrapping tile with it
+                badgeBuilder: (tile) => Badge.count(count: 100, maxCount: 9, offset: const Offset(-2, -4), child: tile),
               ),
-              TileData(title: 'Labels', leading: const Icon(Icons.label_outline), selectedLeading: const Icon(Icons.label)),
+              const TileData(title: 'Labels', leading: Icon(Icons.label_outline), selectedLeading: Icon(Icons.label)),
               TileData(
-                onTap: () {
-                  showAdaptiveAboutDialog(context: context);
-                },
+                onTap: () => showAdaptiveAboutDialog(context: context),
+                tooltip: 'About app',
                 title: 'About',
                 leading: const Icon(Icons.info_outline, size: 18),
                 selectedLeading: const Icon(Icons.info, size: 18),
               ),
               TileData(
-                onTap: () {
-                  showLicensePage(context: context);
-                },
+                onTap: () => showLicensePage(context: context),
                 title: 'Licenses',
                 leading: const Icon(Icons.copyright_outlined, size: 18),
                 selectedLeading: const Icon(Icons.copyright, size: 18),
               ),
             ],
             onIndexChanged: (index) {
-              debugPrint('current index: $index');
+              log('current index: $index');
             },
           ),
           // app content
@@ -196,6 +242,34 @@ class _ExampleScreenState extends State<ExampleScreen> {
                       selected: {themeModeNotifier.value},
                       onSelectionChanged: (value) => setState(() => themeModeNotifier.value = value.first),
                     ),
+                    Wrap(
+                      runSpacing: 5,
+                      spacing: 3,
+                      crossAxisAlignment: .center,
+                      children: [
+                        const Text('App Colors: '),
+                        ...List.generate(appColors.length, (i) {
+                          final color = appColors[i];
+                          final bool isActive = appColorNotifier.value == color;
+                          final widget = Container(
+                            height: 30,
+                            width: 30,
+                            margin: const .all(3.5),
+                            decoration: BoxDecoration(color: color, borderRadius: borderRadius),
+                          );
+
+                          return GestureDetector(
+                            onTap: () => setState(() => appColorNotifier.value = color),
+                            child: isActive
+                                ? DecoratedBox(
+                                    decoration: BoxDecoration(borderRadius: borderRadius, border: .all(color: Colors.grey)),
+                                    child: widget,
+                                  )
+                                : widget,
+                          );
+                        }),
+                      ],
+                    ),
                     const Expanded(child: ColorSchemePreview()),
                   ],
                 ),
@@ -210,22 +284,32 @@ class _ExampleScreenState extends State<ExampleScreen> {
             duration: const Duration(milliseconds: 350),
             menuStyle: SideMenuStyle(textDirection: .rtl, backgroundColor: ColorScheme.of(context).onPrimaryFixed),
             customMenuChild: CustomMenuChild(
-              child: const FlutterLogo(style: .stacked, size: 40),
               childFlex: 0,
-              childPosition: .belowItems,
-            ),
-            items: [
-              TileData(
-                onTap: () {
-                  _controller.toggle();
-                },
-                title: 'Toggle menu',
+              childPosition: .aboveItems,
+              child: Column(
+                mainAxisAlignment: .end,
+                children: [
+                  ListTile(
+                    leading: _isCollapsed == true ? const CircleAvatar(radius: 18, child: Text('LTR')) : null,
+                    title: _isCollapsed == true
+                        ? null
+                        : Text(
+                            'This is a RTL menu',
+                            style: TextStyle(color: ColorScheme.of(context).primaryFixed),
+                            overflow: .ellipsis,
+                          ),
+                    contentPadding: const EdgeInsets.all(5),
+                  ),
+                  Divider(color: ColorScheme.of(context).primaryFixed),
+                ],
               ),
-              TileData(title: 'Example 2'),
+            ),
+            footer: (_, _) => const Center(child: FlutterLogo(style: .stacked, size: 40)),
+            items: [
+              TileData(onTap: () => _controller.toggle(), title: 'Toggle menu'),
+              const TileData(title: 'Example 2'),
               TileData(
-                onTap: () {
-                  showLicensePage(context: context);
-                },
+                onTap: () => showLicensePage(context: context),
                 title: 'Licenses',
                 leading: const Icon(Icons.copyright_outlined, size: 18),
                 selectedLeading: const Icon(Icons.copyright, size: 18),
