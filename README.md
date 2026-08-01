@@ -215,21 +215,21 @@ CollapsibleSideMenu(
 
 ### Elements, types, usage and description
 
-| Element                            |  Type  |    Usage    |                                                                                               Description |
-| :--------------------------------- | :----: | :---------: | --------------------------------------------------------------------------------------------------------: |
-| <a href="#0">SideMenu</a>          | Widget | Menu widget |                                                                                      The side menu widget |
-| <a href="#1">SideMenuStyle</a>     | Class  |    Style    |                                                                                      Menu container style |
-| <a href="#2">MenuTileStyle</a>     | Class  |    Style    |                                                                                           Menu tile style |
-| <a href="#3">SubMenuTileStyle</a>  | Class  |    Style    |                                                                                       Menu sub-tile style |
-| <a href="#4">ToggleButtonStyle</a> | Class  |    Style    |                                                              Toggle button style (to open/close the menu) |
-| SideMenuController                 | Class  | Controller  |                                                                                           Menu controller |
-| TitleData                          | Class  |    Data     |                         Add a simple text with custom style (with no background or tap callback) to items |
-| DividerData                        | Class  |    Data     |                                                                      Add a custom divider widget to items |
-| TileData                           | Class  |    Data     |                                                                                       Add a tile to items |
-| SubTileData                        | Class  |    Data     |                                                                         Add a sub-tile to tile (TileData) |
-| TileBadgeBuilder                   | Class  |   Builder   |                                                                           Data to build a badge on a tile |
-| CustomChildPosition                |  Enum  |    Enum     |                                            Position of the custom child related to items (above or below) |
-| AutoOpenFrom                       |  Enum  |    Enum     | Set from what screen width the menu should adapt when <a href="#ref1">defaultBehaviour</a> is set to auto |
+| Element                              |  Type  |    Usage    |                                                                                               Description |
+| :----------------------------------- | :----: | :---------: | --------------------------------------------------------------------------------------------------------: |
+| <a href="#0">CollapsibleSideMenu</a> | Widget | Menu widget |                                                                                      The side menu widget |
+| <a href="#1">SideMenuStyle</a>       | Class  |    Style    |                                                                                      Menu container style |
+| <a href="#2">MenuTileStyle</a>       | Class  |    Style    |                                                                                           Menu tile style |
+| <a href="#3">SubMenuTileStyle</a>    | Class  |    Style    |                                                                                       Menu sub-tile style |
+| <a href="#4">ToggleButtonStyle</a>   | Class  |    Style    |                                                              Toggle button style (to open/close the menu) |
+| SideMenuController                   | Class  | Controller  |                                                                                           Menu controller |
+| TitleData                            | Class  |    Data     |                         Add a simple text with custom style (with no background or tap callback) to items |
+| DividerData                          | Class  |    Data     |                                                                      Add a custom divider widget to items |
+| TileData                             | Class  |    Data     |                                                                                       Add a tile to items |
+| SubTileData                          | Class  |    Data     |                                                                         Add a sub-tile to tile (TileData) |
+| TileBadgeBuilder                     | Class  |   Builder   |                                                                           Data to build a badge on a tile |
+| CustomChildPosition                  |  Enum  |    Enum     |                                            Position of the custom child related to items (above or below) |
+| AutoOpenFrom                         |  Enum  |    Enum     | Set from what screen width the menu should adapt when <a href="#ref1">defaultBehaviour</a> is set to auto |
 
 <br>
 
@@ -247,7 +247,7 @@ CollapsibleSideMenu(
 
   <!-- SideMenu -->
   <tr id="0">
-    <td rowspan="17">SideMenu</td>
+    <td rowspan="17">CollapsibleSideMenu</td>
     <td>header</td>
     <td>MenuHeaderBuilder?</td>
     <td>null</td>

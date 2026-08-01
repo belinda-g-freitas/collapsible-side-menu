@@ -218,7 +218,7 @@ class CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenuS
   Timer? _resizeDebounce;
   bool _isWidthInitialized = false, _derivedValuesInitialized = false;
 
-  //
+  /// 
   void _onSelect(int rootIndex, List<int> path) {
     _selection.value = _SelectionState(index: rootIndex, path: path);
     widget.onIndexChanged?.call(rootIndex);
@@ -232,16 +232,19 @@ class CollapsibleSideMenuState extends State<CollapsibleSideMenu> with SideMenuS
     _openNodes.value = updated; // no setState, only SideMenuTile listeners rebuild
   }
 
+  /// Expand side menu
   void _openMenu() {
     if (!_isMenuOpen) setState(() => _isMenuOpen = true);
     widget.controller?._updateCollapsed(false);
   }
 
+  /// Collapse side menu
   void _closeMenu() {
     if (_isMenuOpen) setState(() => _isMenuOpen = false);
     widget.controller?._updateCollapsed(true);
   }
 
+  /// toggle side menu
   void _toggleMenu() {
     setState(() => _isMenuOpen = !_isMenuOpen);
     widget.controller?._updateCollapsed(!_isMenuOpen);

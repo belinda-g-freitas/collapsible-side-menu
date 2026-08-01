@@ -50,7 +50,6 @@ Set :
 - etc.
 
 ## 1.0.1
-  
   - Fixed some directionality issues
   - Added Codecov
   
@@ -68,3 +67,6 @@ Set :
   - Added a live demo
   - Updated README
   - Some other updates (refer to README)
+
+## 2.1.0
+  - Added animation between (current) tiles' swaps

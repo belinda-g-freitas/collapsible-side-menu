@@ -430,7 +430,9 @@ class _SideMenuTileState extends State<SideMenuTile> {
       },
       borderRadius: _style.borderRadius,
       hoverColor: _style.hoverColor,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeIn,
         height: _style.tileHeight,
         padding: _style.padding,
         decoration: tileDecoration,
