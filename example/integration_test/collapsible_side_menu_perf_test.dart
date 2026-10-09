@@ -47,11 +47,12 @@
 
 import 'dart:io' show Platform;
 
-import 'package:collapsible_side_menu/collapsible_side_menu.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:material_ui/material_ui.dart';
+
+import 'package:collapsible_side_menu/collapsible_side_menu.dart';
 
 const _k60fpsFrameBudgetMs = 16.67;
 

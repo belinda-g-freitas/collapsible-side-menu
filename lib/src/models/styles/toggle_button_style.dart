@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show Color, IconData;
+import 'package:material_ui/material_ui.dart' show Color, IconData;
 
 import '../../utils/menu_constants.dart';
 

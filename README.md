@@ -27,6 +27,7 @@
     - [Import package](#import-package)
     - [Basic usage example](#basic-usage-example)
     - [🚩 BREAKING CHANGES from 1.x.x to 2.x.x](#-breaking-changes-from-1xx-to-2xx)
+    - [🚩 BREAKING CHANGES from 2.x.x to 3.x.x](#-breaking-changes-from-2xx-to-3xx)
   - [Essentials](#essentials)
     - [Elements, types, usage and description](#elements-types-usage-and-description)
     - [Class, parameters, types and defaults](#class-parameters-types-and-defaults)
@@ -210,6 +211,13 @@ CollapsibleSideMenu(
 | SideMenuController().isCollapsed | bool Function |
 | TileData().id                    |       String? |
 | SubTileData().id                 |       String? |
+
+### 🚩 BREAKING CHANGES from 2.x.x to 3.x.x
+
+Requirements:
+
+- flutter >= 3.47.0
+- "material_ui" package instead of "material" package from the SDK
 
 ## Essentials
 

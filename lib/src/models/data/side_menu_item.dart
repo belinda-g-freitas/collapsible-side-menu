@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show Divider, EdgeInsetsGeometry, TextAlign, TextStyle, Widget;
+import 'package:material_ui/material_ui.dart' show Divider, EdgeInsetsGeometry, TextAlign, TextStyle, Widget;
 
 import '../../utils/types.dart';
 import '../styles/menu_tile_style.dart';
@@ -124,7 +124,7 @@ class TileData extends SideMenuItem with _BaseSideMenuData {
   @override
   final VoidCallback? onTap;
 
-  TileData resolveWith([final MenuTileStyle? style]) {
+  TileData resolveWith([MenuTileStyle? style]) {
     return TileData(
       title: title,
       leading: leading,
@@ -237,7 +237,7 @@ class SubTileData extends SideMenuItem with _BaseSideMenuData {
     this.onTap,
   });
 
-  SubTileData resolveWith([final SubMenuTileStyle? style]) {
+  SubTileData resolveWith([SubMenuTileStyle? style]) {
     return SubTileData(
       title: title,
       leading: leading,

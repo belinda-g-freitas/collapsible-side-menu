@@ -1,7 +1,7 @@
 import 'dart:async' show Timer;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'enums/auto_open_from.dart';
 import 'enums/menu_behaviour.dart';

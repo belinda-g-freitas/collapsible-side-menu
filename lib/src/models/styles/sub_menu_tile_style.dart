@@ -31,7 +31,7 @@ class SubMenuTileStyle extends BaseTileStyle {
        assert(selectedDecoration == null || selectedDecoration.debugAssertIsValid());
 
   /// Uses values from this style if default are null
-  SubMenuTileStyle resolveWith([final SubMenuTileStyle? style]) {
+  SubMenuTileStyle resolveWith([SubMenuTileStyle? style]) {
     if (style == null) return this;
 
     return SubMenuTileStyle(
@@ -55,7 +55,7 @@ class SubMenuTileStyle extends BaseTileStyle {
     );
   }
 
-  SubMenuTileStyle merge([final MenuTileStyle? style]) {
+  SubMenuTileStyle merge([MenuTileStyle? style]) {
     if (style == null) return this;
 
     return SubMenuTileStyle(
@@ -65,7 +65,8 @@ class SubMenuTileStyle extends BaseTileStyle {
       selectedColor: selectedColor ?? style.subTileStyle?.selectedColor ?? style.selectedColor,
       hoverColor: hoverColor ?? style.subTileStyle?.hoverColor ?? style.hoverColor,
       backgroundColor: style.subTileStyle?.backgroundColor ?? backgroundColor,
-      selectedBackgroundColor: selectedBackgroundColor ?? style.subTileStyle?.selectedBackgroundColor ?? style.selectedBackgroundColor,
+      selectedBackgroundColor:
+          selectedBackgroundColor ?? style.subTileStyle?.selectedBackgroundColor ?? style.selectedBackgroundColor,
       borderRadius: style.subTileStyle?.borderRadius ?? borderRadius,
       tileHeight: style.subTileStyle?.tileHeight ?? tileHeight,
       decoration: decoration ?? style.subTileStyle?.decoration ?? style.decoration,

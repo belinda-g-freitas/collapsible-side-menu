@@ -70,3 +70,7 @@ Set :
 
 ## 2.1.0
   - Added animation between (current) tiles' swaps
+
+## 3.0.0
+  - Migrated to flutter >= 3.47.0
+  - Migrated to "material_ui" package instead of "material" package from the SDK

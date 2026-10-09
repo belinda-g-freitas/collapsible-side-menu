@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/data/side_menu_item.dart';
 
 class SideMenuDivider extends StatelessWidget {

@@ -1,11 +1,10 @@
 import 'dart:developer' show log;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:collapsible_side_menu/collapsible_side_menu.dart';
 
 final themeModeNotifier = ValueNotifier<ThemeMode>(.system);
-final appColorNotifier = ValueNotifier<Color>(const Color(0xFF_292CFF));
 const appColors = [
   Color(0xFF_F43F5E),
   Color(0xFF_9333EA),
@@ -14,8 +13,9 @@ const appColors = [
   Color(0xFF_292CFF),
   Color(0xFF_0D9488),
 ];
+final appColorNotifier = ValueNotifier<Color>(appColors.last);
 const borderRadius = BorderRadius.all(.circular(10));
-const RoundedRectangleBorder roundedBorder = .new(borderRadius: borderRadius);
+const roundedBorder = RoundedRectangleBorder(borderRadius: borderRadius);
 
 void main() {
   runApp(const MainApp());
@@ -262,7 +262,10 @@ class _ExampleScreenState extends State<ExampleScreen> {
                             onTap: () => setState(() => appColorNotifier.value = color),
                             child: isActive
                                 ? DecoratedBox(
-                                    decoration: BoxDecoration(borderRadius: borderRadius, border: .all(color: Colors.grey)),
+                                    decoration: BoxDecoration(
+                                      borderRadius: borderRadius,
+                                      border: .all(color: Colors.grey),
+                                    ),
                                     child: widget,
                                   )
                                 : widget,
@@ -290,7 +293,7 @@ class _ExampleScreenState extends State<ExampleScreen> {
                 mainAxisAlignment: .end,
                 children: [
                   ListTile(
-                    leading: _isCollapsed == true ? const CircleAvatar(radius: 18, child: Text('LTR')) : null,
+                    leading: _isCollapsed == true ? const CircleAvatar(radius: 18, child: Text('RTL')) : null,
                     title: _isCollapsed == true
                         ? null
                         : Text(

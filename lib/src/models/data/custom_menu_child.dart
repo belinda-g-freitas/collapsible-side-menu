@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show Widget, Spacer;
+import 'package:material_ui/material_ui.dart' show Widget, Spacer;
 
 import '../../enums/custom_child_position.dart';
 

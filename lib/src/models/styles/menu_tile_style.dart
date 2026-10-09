@@ -38,7 +38,7 @@ class MenuTileStyle extends BaseTileStyle {
        assert(selectedIndicator == null || selectedIndicator.debugAssertIsValid());
 
   /// Uses values from this style if default are null
-  MenuTileStyle resolveWith(final MenuTileStyle? style) {
+  MenuTileStyle resolveWith(MenuTileStyle? style) {
     if (style == null) return this;
 
     return MenuTileStyle(

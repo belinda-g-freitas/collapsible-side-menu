@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  material_ui: ^1.6.0
   collapsible_side_menu:
     path: ../
 
